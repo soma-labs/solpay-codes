@@ -18,7 +18,7 @@ export default function Layout({ children }: { children: any }) {
                 <nav className="cma-main-navigation d-flex align-items-center">
                     <ul className="cma-menu d-flex align-items-center">
                         <li className="cma-menu__item">
-                            <Link href='/pages'>
+                            <Link href='/'>
                                 <a>Home</a>
                             </Link>
                         </li>
