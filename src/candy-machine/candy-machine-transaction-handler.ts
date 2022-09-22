@@ -9,8 +9,8 @@ import {getCandyMachineAccount, mintOneToken} from "./candy-machine";
 import getAffiliateAccountAddress from "../program/affiliate-accounts/get-affiliate-account-address";
 
 const SOLPAY_TREASURY = process.env.NEXT_PUBLIC_SOLPAY_TREASURY as string;
-const SOLPAY_FEE_PERCENTAGE = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_PERCENTAGE as string);
-const SOLPAY_FEE_AFFILIATE_LINK_PERCENTAGE = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_AFFILIATE_LINK_PERCENTAGE as string);
+const SOLPAY_FEE_NORMAL_MINT = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_NORMAL_MINT as string);
+const SOLPAY_FEE_AFFILIATE_MINT = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_AFFILIATE_MINT as string);
 
 const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiResponse) => {
     const connection = new Web3.Connection(
@@ -55,7 +55,7 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
         walletPublicKey,
     );
 
-    let solpayFeePercentage = SOLPAY_FEE_PERCENTAGE;
+    let solpayFeePercentage = SOLPAY_FEE_NORMAL_MINT;
 
     if (affiliate) {
         const affiliateAccountAddress = await getAffiliateAccountAddress(
@@ -66,7 +66,7 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
         );
 
         if (affiliateAccountAddress !== null) {
-            solpayFeePercentage = SOLPAY_FEE_AFFILIATE_LINK_PERCENTAGE;
+            solpayFeePercentage = SOLPAY_FEE_AFFILIATE_MINT;
 
             const affiliateWalletFeeInstruction = SystemProgram.transfer({
                 fromPubkey: walletPublicKey,
