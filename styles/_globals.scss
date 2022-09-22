@@ -1,0 +1,93 @@
+html,
+body {
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #ffd700;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    color: #eee;
+    background: #123;
+}
+
+img {
+    max-width: 100%;
+}
+
+.cma-header {
+    padding: 0.5rem;
+    background: #000;
+}
+
+.cma-menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cma-menu__item {
+    margin: 0 1rem;
+}
+
+.cma-login-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+    border-radius: 5px;
+    font-weight: 600;
+
+    & > span:first-child {
+
+        margin-right: 0.5rem !important;
+    }
+}
+
+.cma-login-button--login {
+    background: #ffd700;
+    color: #5435d1;
+
+}
+
+.cma-login-button--logout {
+    background: #5435d1;
+    color: #ffd700;
+}
+
+.button {
+    display: inline-block;
+    border: 0;
+    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+    border-radius: 5px;
+    font-weight: 600;
+    color: #ffd700;
+}
+
+.button--hollow {
+    background: none;
+    border: 1px solid #ffd700;
+}
+
+.button--danger {
+    color: #f70d1a ;
+    border-color: #f70d1a ;
+}
+
+.grecaptcha-badge {
+    visibility: hidden;
+}

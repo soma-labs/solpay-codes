@@ -1,0 +1,78 @@
+.button--register-project {
+    position: sticky;
+    top: 1rem;
+}
+
+.nft-projects {
+
+}
+
+.nft-project-item {
+    padding: 1rem;
+}
+
+.nft-project {
+
+}
+
+.nft-project__header {
+
+}
+
+.nft-project__image-container {
+
+}
+
+.nft-project__image {
+
+}
+
+.nft-project__title {
+
+}
+
+.nft-project__description {
+
+}
+
+.nft-project__affiliates {
+
+}
+
+.nft-project__actions {
+
+}
+
+.nft-project--loop {
+    padding: 1rem;
+    border: 1px solid #a0F;
+    height: 100%;
+    transition: all 0.1s ease-out;
+
+    &:hover {
+        box-shadow: 1px 1px 5px #a0f;
+    }
+
+    .nft-project__image-container {
+        height: 20rem;
+        overflow: hidden;
+    }
+
+    .nft-project__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .nft-project__description {
+        overflow: hidden;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+    }
+
+    .nft-project__title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

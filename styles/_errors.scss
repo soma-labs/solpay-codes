@@ -1,0 +1,22 @@
+.error-message {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    animation: errorMessageFadeUp 0.3s forwards;
+}
+
+@keyframes errorMessageFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-dismissible .btn-close {
+    background-size: 30%;
+}
