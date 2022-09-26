@@ -1,11 +1,27 @@
-.error-message {
+.popup-message {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    animation: errorMessageFadeUp 0.3s forwards;
+    animation: messageFadeUp 0.3s forwards;
 }
 
-@keyframes errorMessageFadeUp {
+.popup-message--error {
+
+}
+
+.popup-message--success {
+
+}
+
+.popup-message--notification {
+
+}
+
+.popup-message__text {
+    font-weight: 600;
+}
+
+@keyframes messageFadeUp {
     0% {
         opacity: 0;
         transform: translateY(100%);

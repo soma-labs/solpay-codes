@@ -2,3 +2,87 @@
     background: #123;
     min-height: 100vh;
 }
+
+.cma-menu-name {
+    display: inline-block;
+    font-size: 1rem;
+    color: #aaa;
+    margin: 1.5rem 0;
+}
+
+.cma-menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cma-menu__item {
+    font-size: 1.5rem;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.cma-menu__item:last-child {
+    margin: 0;
+}
+
+.cma-login-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+    border-radius: 5px;
+    font-weight: 600;
+
+    & > span:first-child {
+
+        margin-right: 0.5rem !important;
+    }
+}
+
+.cma-login-button--login {
+    background: #ffd700;
+    color: #5435d1;
+
+}
+
+.cma-login-button--logout {
+    background: #5435d1;
+    color: #ffd700;
+}
+
+.button--register-project {
+}
+
+.cma-main {
+    width: 100%;
+}
+
+.cma-header {
+    background: #123;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    padding: 0.5rem;
+    z-index: 2;
+}
+
+.cma-main__content {
+    position: relative;
+    width: 100%;
+    padding: 4rem 1rem 0;
+}
+
+.cma-main__sidebar {
+    position: relative;
+    width: 15rem;
+    background: #000;
+    z-index: 3;
+}
+
+.cma-main__sidebar__logo {
+    width: 100%;
+    height: 10rem;
+    background: #507;
+}

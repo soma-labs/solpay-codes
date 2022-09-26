@@ -1,13 +1,13 @@
 import {useContext, useEffect, useRef, useState} from "react";
-import {AuthContext} from "../../../src/providers/auth-provider";
+import {AuthContext} from "../../src/providers/auth-provider";
 import {useRouter} from "next/router";
 import {PublicKey} from "@solana/web3.js";
-import registerProjectAccount from "../../../src/program/project-accounts/register-project-account";
-import getProjectData from "../../../src/models/project/get-project-data";
-import ProjectData from "../../../src/models/project/project-data";
-import {PopupMessageContext, PopupMessageTypes} from "../../../src/providers/popup-message-provider";
+import registerProjectAccount from "../../src/program/project-accounts/register-project-account";
+import getProjectData from "../../src/models/project/get-project-data";
+import ProjectData from "../../src/models/project/project-data";
+import {PopupMessageContext, PopupMessageTypes} from "../../src/providers/popup-message-provider";
 
-export default function PendingProject() {
+export default function MyPendingProject() {
     const {setMessage} = useContext(PopupMessageContext);
     const {wallet, connection} = useContext(AuthContext);
     const [projectData, setProjectData] = useState<ProjectData|null>(null);
@@ -27,7 +27,7 @@ export default function PendingProject() {
                 redeemThresholdInSol: parseFloat(formData.get('redeem_threshold_in_sol') as string),
             }, wallet, connection);
 
-            router.push(`/my-account/projects`);
+            router.push(`/`);
         } catch (e) {
             if (e instanceof Error) {
                 setMessage(e.message, PopupMessageTypes.Error);
@@ -58,42 +58,48 @@ export default function PendingProject() {
         <>
             {!projectData ? null :
                 <section className="nft-project nft-project--details">
-                    <header className="nft-project__header mb-5">
-                        <h1 className="nft-project__title">
-                            {projectData.title || `Candy Machine: ${candyMachine}`}
-                        </h1>
-                        <div className="nft-project__description">
-                            {projectData.description}
+                    <div className="d-flex flex-wrap">
+                        <div className="col-3">
+                            <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
+                                {projectData?.image_url &&
+                                    <img src={projectData?.image_url} className="nft-project__image" alt=""/>}
+                            </div>
                         </div>
-                    </header>
+                        <div className="col ps-4">
+                            <header className="nft-project__header mb-5">
+                                <h1 className="nft-project__title">
+                                    {projectData.title || `Candy Machine: ${candyMachine}`}
+                                </h1>
+                                <div className="nft-project__description">
+                                    {projectData.description}
+                                </div>
+                            </header>
 
-                    <div className="mb-5">
-                        <section className="d-flex">
-                            <form ref={formRef} className="cma-project-form" onSubmit={onProjectRegistrationFormSubmit}>
+                            <form ref={formRef} className="cma-project-form form" onSubmit={onProjectRegistrationFormSubmit}>
                                 <input type="hidden" name="candy_machine_id" value={projectData.candy_machine_id.toString()}/>
                                 <p>
-                                    <label className="w-100">
-                                        Affiliate fee percentage
+                                    <label className="form-label w-100">
+                                        <span className="d-inline-block mb-1">Affiliate fee percentage</span>
                                         <input
                                             type="number"
                                             name="affiliate_fee_percentage"
                                             min={0}
                                             max={100}
                                             step={0.01}
-                                            className="w-100"
+                                            className="form-control w-100"
                                             required
                                         />
                                     </label>
                                 </p>
                                 <p>
-                                    <label className="w-100">
-                                        Redeem Threshold in SOL
+                                    <label className="form-label w-100">
+                                        <span className="d-inline-block mb-1">Redeem Threshold in SOL</span>
                                         <input
                                             type="number"
                                             name="redeem_threshold_in_sol"
                                             min={0}
                                             step={0.01}
-                                            className="w-100"
+                                            className="form-control w-100"
                                             required
                                         />
                                     </label>
@@ -102,7 +108,7 @@ export default function PendingProject() {
                                     <button className="button button--hollow">Finish registration</button>
                                 </p>
                             </form>
-                        </section>
+                        </div>
                     </div>
                 </section>
             }

@@ -1,44 +1,21 @@
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useRef} from "react";
 import {AuthContext} from "../../../../src/providers/auth-provider";
-import {ErrorMessageContext} from "../../../../src/providers/error-message-provider";
+import {PopupMessageContext, PopupMessageTypes} from "../../../../src/providers/popup-message-provider";
 import {useRouter} from "next/router";
-import AffiliateAccount from "../../../../src/program/affiliate-accounts/affiliate-account";
-import getAffiliateAccounts from "../../../../src/program/affiliate-accounts/get-affiliate-accounts";
 import {PublicKey} from "@solana/web3.js";
-import getProjectAccount from "../../../../src/program/project-accounts/get-project-account";
-import getProjectData from "../../../../src/models/project/get-project-data";
-import Project from "../../../../src/models/project/project";
 import AdminLayout from "../../../../src/components/layouts/admin-layout";
-import closeAffiliateAccount from "../../../../src/program/affiliate-accounts/close-affiliate-account";
 import updateProjectAccount from "../../../../src/program/project-accounts/update-project-account";
+import useProject from "../../../../src/hooks/useProject";
+import LoadingIcon from "../../../../src/components/loading-icon";
+import ProjectAffiliates from "../../../../src/components/projects/project-affiliates";
 
 export default function AdminProjectDetails() {
-    const {setErrorMessage} = useContext(ErrorMessageContext);
+    const {setMessage} = useContext(PopupMessageContext);
     const {wallet, connection} = useContext(AuthContext);
-    const [project, setProject] = useState<Project|null>(null);
-    const [affiliateAccounts, setAffiliateAccounts] = useState<AffiliateAccount[]>([]);
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
-    const [refresh, setRefresh] = useState<number>(Date.now());
     const {owner, candyMachine} = router.query;
-
-    const onCloseAffiliateAccountAction = async (affiliateAccount: AffiliateAccount) => {
-        try {
-            await closeAffiliateAccount({
-                affiliate: affiliateAccount.data.affiliate_pubkey,
-                owner: affiliateAccount.data.project_owner_pubkey,
-                candyMachineId: affiliateAccount.data.candy_machine_id,
-            }, wallet, connection);
-
-            setRefresh(Date.now());
-        } catch (e) {
-            if (e instanceof Error) {
-                setErrorMessage(e.message);
-            } else {
-                console.log(e);
-            }
-        }
-    };
+    const {projectLoading, project, affiliateAccounts} = useProject(owner as string, candyMachine as string);
 
     const onProjectUpdateFormSubmit = async (e: any) => {
         e.preventDefault();
@@ -52,60 +29,20 @@ export default function AdminProjectDetails() {
                 affiliateFeePercentage: parseFloat(formData.get('affiliate_fee_percentage') as string),
                 redeemThresholdInSol: parseFloat(formData.get('redeem_threshold_in_sol') as string),
             }, wallet, connection);
-
-            setRefresh(Date.now());
         } catch (e) {
             if (e instanceof Error) {
-                setErrorMessage(e.message);
+                setMessage(e.message, PopupMessageTypes.Error);
             } else {
                 console.log(e);
             }
         }
     };
 
-    useEffect(() => {
-        (async () => {
-            if (!owner || !candyMachine) {
-                return;
-            }
-
-            const ownerPubkey = new PublicKey(owner as string);
-            const candyMachinePubkey = new PublicKey(candyMachine as string);
-            const projectAccount = await getProjectAccount(
-                ownerPubkey,
-                candyMachinePubkey,
-                connection
-            );
-
-            if (!projectAccount) {
-                return;
-            }
-
-            const projectData = await getProjectData(
-                ownerPubkey,
-                candyMachinePubkey,
-            );
-            const project = new Project(projectAccount, projectData);
-            const affiliateAccounts = await getAffiliateAccounts(
-                connection,
-                {
-                    owner: ownerPubkey,
-                    candyMachineId: candyMachinePubkey,
-                }
-            );
-
-            affiliateAccounts.forEach(affiliateAccount => affiliateAccount.setAssociatedProject(project));
-
-            setProject(project);
-            setAffiliateAccounts(affiliateAccounts);
-        })();
-    }, [owner, candyMachine, refresh]);
-
     return (
         <AdminLayout>
-            {!project ? null :
+            {projectLoading ? <LoadingIcon/>: !project ? null :
                 <section className="nft-project nft-project--details">
-                    <div className="d-flex mb-3">
+                    <div className="d-flex flex-wrap mb-3">
                         <div className="col-3">
                             <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
                                 {project.projectData?.image_url &&
@@ -126,7 +63,7 @@ export default function AdminProjectDetails() {
                             <form ref={formRef} onSubmit={onProjectUpdateFormSubmit} className="form col col-md-3">
                                 <p>
                                     <label className="form-label w-100">
-                                        <strong>Affiliate fee (%):</strong>
+                                        <span className="d-inline-block mb-1">Affiliate fee (%):</span>
                                         <input
                                             type="number"
                                             name="affiliate_fee_percentage"
@@ -140,7 +77,7 @@ export default function AdminProjectDetails() {
                                 </p>
                                 <p>
                                     <label className="form-label w-100">
-                                        <strong>Affiliate target (SOL):</strong>
+                                        <span className="d-inline-block mb-1">Affiliate target (SOL):</span>
                                         <input
                                             type="number"
                                             name="redeem_threshold_in_sol"
@@ -158,41 +95,12 @@ export default function AdminProjectDetails() {
                             </form>
                         </div>
                     </div>
-                    {affiliateAccounts.length > 0 ?
-                        <section className="nft-project__affiliates">
-                            <h4>Nb of affiliates: {affiliateAccounts.length}</h4>
-                            <table className="table table-dark table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Affiliate wallet</th>
-                                        <th>Target progress (%)</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        affiliateAccounts.map((affiliateAccount, index) =>
-                                            <tr key={index}>
-                                                <td>{index + 1}</td>
-                                                <td>{affiliateAccount.data.affiliate_pubkey.toString()}</td>
-                                                <td>{affiliateAccount.targetProgress()}%</td>
-                                                <td>
-                                                    <button
-                                                        className="button button--hollow button--danger"
-                                                        onClick={onCloseAffiliateAccountAction.bind(null, affiliateAccount)}
-                                                    >
-                                                        Close affiliate account
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        )
-                                    }
-                                </tbody>
-                            </table>
-                        </section>
-                        : null
-                    }
+
+                    <ProjectAffiliates
+                        owner={owner as string}
+                        candyMachine={candyMachine as string}
+                        defaultAffiliateAccounts={affiliateAccounts}
+                    />
                 </section>
             }
         </AdminLayout>

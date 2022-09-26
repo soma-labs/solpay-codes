@@ -1,10 +1,10 @@
 import Link from "next/link";
-import useProjects from "../src/hooks/useProjects";
-import LoadingIcon from "../src/components/loading-icon";
-import ProjectCard from "../src/components/projects/project-card";
+import useProjects from "../../src/hooks/useProjects";
+import LoadingIcon from "../../src/components/loading-icon";
+import ProjectCard from "../../src/components/projects/project-card";
 
-export default function Home() {
-    const {projects, projectsLoading} = useProjects();
+export default function MyProjects() {
+    const {projects, projectsLoading} = useProjects(true);
 
     return (
         <section className="nft-projects d-flex flex-wrap">
@@ -23,8 +23,7 @@ export default function Home() {
                                 </Link>
                             ]}
                         />
-                    </div>
-                )
+                    </div>)
             }
         </section>
     );

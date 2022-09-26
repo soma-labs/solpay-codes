@@ -9,6 +9,8 @@ export type AuthContextType = {
     connection: Connection,
     login: () => Promise<any>,
     logout: () => Promise<any>,
+    walletHasAffiliateAccounts: boolean,
+    setWalletHasAffiliateAccounts: any,
 };
 
 export const AuthContext = React.createContext<AuthContextType>({} as AuthContextType);
@@ -22,22 +24,25 @@ export default function AuthProvider({children}: {children: any}) {
     let [, setIsConnected] = useState<boolean>(false);
     let [wallet] = useState<WalletAdapter>(new PhantomWalletAdapter());
     let [connection] = useState<Connection>(defaultConnection);
+    let [walletHasAffiliateAccounts, setWalletHasAffiliateAccounts] = useState<boolean>(false);
 
     wallet
         .on('connect', (publicKey: PublicKey) => setIsConnected(true))
         .on('disconnect', () => setIsConnected(false));
 
-    const login = () => {
-        return wallet.connect();
+    const login = async () => {
+        await wallet.connect();
     };
 
-    const logout = () => {
-        return wallet.disconnect();
+    const logout = async () => {
+        await wallet.disconnect();
     };
 
     const defaultAuthContextValue: AuthContextType = {
         wallet,
         connection,
+        walletHasAffiliateAccounts,
+        setWalletHasAffiliateAccounts,
         login,
         logout,
     };

@@ -1,17 +1,16 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext} from "react";
 import {AuthContext} from "../../src/providers/auth-provider";
 import Link from "next/link";
 import AffiliateAccount from "../../src/program/affiliate-accounts/affiliate-account";
-import getAffiliateAccounts from "../../src/program/affiliate-accounts/get-affiliate-accounts";
 import redeemReward from "../../src/program/affiliate-accounts/redeem-reward";
 import MyAccountLayout from "../../src/components/layouts/my-account-layout";
 import LoadingIcon from "../../src/components/loading-icon";
 import ProjectCard from "../../src/components/projects/project-card";
+import useAffiliateAccounts from "../../src/hooks/useAffiliateAccounts";
 
 export default function MyAffiliateAccounts() {
     const {wallet, connection} = useContext(AuthContext);
-    const [affiliateAccountsLoading, setAffiliateAccountsLoading] = useState<boolean>(true);
-    const [affiliateAccounts, setAffiliateAccounts] = useState<AffiliateAccount[]>([]);
+    const {affiliateAccountsLoading, affiliateAccounts} = useAffiliateAccounts({affiliate: wallet?.publicKey?.toString()});
 
     const onClaimReward = async (affiliateAccount: AffiliateAccount) => {
         await redeemReward(
@@ -37,29 +36,6 @@ export default function MyAffiliateAccounts() {
             </button>
             :
             <strong>Progress: {affiliateAccount.targetProgress()}%</strong>;
-
-    useEffect(() => {
-        (async () => {
-            if (!wallet.publicKey) {
-                setAffiliateAccountsLoading(false);
-                return;
-            }
-
-            const affiliateAccounts = await getAffiliateAccounts(
-                connection,
-                {
-                    affiliate: wallet.publicKey
-                }
-            );
-
-            for (let i = affiliateAccounts.length - 1; i >= 0; i--) {
-                await affiliateAccounts[i].getAssociatedProject(connection);
-            }
-
-            setAffiliateAccounts(affiliateAccounts);
-            setAffiliateAccountsLoading(false);
-        })();
-    }, [wallet.connected]);
 
     return (
         <MyAccountLayout>

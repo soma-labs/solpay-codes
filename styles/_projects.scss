@@ -1,8 +1,3 @@
-.button--register-project {
-    position: sticky;
-    top: 1rem;
-}
-
 .nft-projects {
 
 }
@@ -32,6 +27,10 @@
 }
 
 .nft-project__description {
+
+}
+
+.nft-project__details {
 
 }
 
@@ -75,4 +74,21 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+}
+
+.projects-table {
+    td {
+        vertical-align: middle;
+    }
+}
+
+.projects-table__image {
+    width: 3rem;
+    height: 3rem;
+    object-fit: cover;
+}
+
+.cma-project-form {
+    width: 25rem;
+    max-width: 100%;
 }

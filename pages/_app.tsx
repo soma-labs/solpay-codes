@@ -2,16 +2,16 @@ import '../styles/main.scss';
 import type {AppProps} from 'next/app';
 import Layout from "../src/components/layouts/layout";
 import AuthProvider from "../src/providers/auth-provider";
-import ErrorMessageProvider from "../src/providers/error-message-provider";
+import PopupMessageProvider from "../src/providers/popup-message-provider";
 
 function MyApp({Component, pageProps}: AppProps) {
-    return <ErrorMessageProvider>
+    return <PopupMessageProvider>
         <AuthProvider>
             <Layout>
                 <Component {...pageProps} />
             </Layout>
         </AuthProvider>
-    </ErrorMessageProvider>;
+    </PopupMessageProvider>;
 }
 
 export default MyApp;

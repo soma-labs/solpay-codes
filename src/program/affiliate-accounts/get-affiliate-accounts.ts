@@ -3,13 +3,15 @@ import AffiliateAccount, {AffiliateAccountDiscriminator} from "./affiliate-accou
 import {CmaProgramId} from "../constants";
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 
+export type AffiliateAccountsOptionsType = {
+    affiliate?: PublicKey,
+    owner?: PublicKey,
+    candyMachineId?: PublicKey,
+};
+
 const getAffiliateAccounts = async (
     connection: Connection,
-    options?: {
-        affiliate?: PublicKey,
-        owner?: PublicKey,
-        candyMachineId?: PublicKey,
-    }
+    options?: AffiliateAccountsOptionsType
 ): Promise<AffiliateAccount[]> => {
     let filters = [
         {

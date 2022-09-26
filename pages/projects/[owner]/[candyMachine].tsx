@@ -1,23 +1,18 @@
-import {useContext, useEffect, useRef, useState} from "react";
-import {AuthContext} from "../../../src/providers/auth-provider";
-import {ErrorMessageContext} from "../../../src/providers/error-message-provider";
 import {useRouter} from "next/router";
-import AffiliateAccount from "../../../src/program/affiliate-accounts/affiliate-account";
-import getAffiliateAccounts from "../../../src/program/affiliate-accounts/get-affiliate-accounts";
 import {PublicKey} from "@solana/web3.js";
-import getProjectAccount from "../../../src/program/project-accounts/get-project-account";
-import getProjectData from "../../../src/models/project/get-project-data";
-import Project from "../../../src/models/project/project";
 import registerAffiliateAccount from "../../../src/program/affiliate-accounts/register-affiliate-account";
+import useProject from "../../../src/hooks/useProject";
+import {useContext} from "react";
+import {AuthContext} from "../../../src/providers/auth-provider";
+import {PopupMessageContext, PopupMessageTypes} from "../../../src/providers/popup-message-provider";
+import LoadingIcon from "../../../src/components/loading-icon";
 
 export default function ProjectDetails() {
-    const {setErrorMessage} = useContext(ErrorMessageContext);
-    const {wallet, connection} = useContext(AuthContext);
-    const [project, setProject] = useState<Project|null>(null);
-    const [affiliateAccounts, setAffiliateAccounts] = useState<AffiliateAccount[]>([]);
     const router = useRouter();
-    const formRef = useRef<HTMLFormElement>(null);
     const {owner, candyMachine} = router.query;
+    const {setMessage} = useContext(PopupMessageContext);
+    const {wallet, connection, setWalletHasAffiliateAccounts} = useContext(AuthContext);
+    const {projectLoading, project, affiliateAccounts} = useProject(owner as string, candyMachine as string);
 
     const onAffiliateRegistrationFormSubmit = async (e: any) => {
         e.preventDefault();
@@ -28,10 +23,12 @@ export default function ProjectDetails() {
                 candyMachineId: new PublicKey(candyMachine as string)
             }, wallet, connection);
 
-            router.push(`/my-account/affiliate-accounts`);
+            setWalletHasAffiliateAccounts(true);
+
+            router.push(`/my-earnings`);
         } catch (e: any) {
             if (e instanceof Error) {
-                setErrorMessage(e.message);
+                setMessage(e.message, PopupMessageTypes.Error);
 
                 return;
             }
@@ -40,52 +37,14 @@ export default function ProjectDetails() {
         }
     };
 
-    useEffect(() => {
-        (async () => {
-            if (!owner || !candyMachine) {
-                return;
-            }
-
-            const ownerPubkey = new PublicKey(owner as string);
-            const candyMachinePubkey = new PublicKey(candyMachine as string);
-            const projectAccount = await getProjectAccount(
-                ownerPubkey,
-                candyMachinePubkey,
-                connection
-            );
-
-            if (!projectAccount) {
-                return;
-            }
-
-            const projectData = await getProjectData(
-                ownerPubkey,
-                candyMachinePubkey,
-            );
-            const project = new Project(projectAccount, projectData);
-
-            setProject(project);
-            setAffiliateAccounts(
-                await getAffiliateAccounts(
-                    connection,
-                    {
-                        owner: ownerPubkey,
-                        candyMachineId: candyMachinePubkey,
-                    }
-                )
-            );
-        })();
-    }, [owner, candyMachine]);
-
     return (
-        <>
-            {!project ? null :
-                <section className="nft-project nft-project--details container d-flex">
+        <section className="nft-project nft-project--details d-flex">
+            {projectLoading ? <LoadingIcon/>: !project ? null :
+                <>
                     <div className="col-3">
                         <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
                             {project.projectData?.image_url &&
-                                <img src={project.projectData?.image_url} className="nft-project__image" alt=""/>
-                            }
+                                <img src={project.projectData?.image_url} className="nft-project__image" alt=""/>}
                         </div>
                     </div>
                     <div className="col ps-4">
@@ -99,7 +58,7 @@ export default function ProjectDetails() {
                         </header>
 
                         <div className="mb-5">
-                            <section>
+                            <section className="nft-project__details">
                                 <h4>Details:</h4>
                                 <ul>
                                     <li>Affiliate fee (%): {project.projectAccount.data.affiliate_fee_percentage}</li>
@@ -107,34 +66,26 @@ export default function ProjectDetails() {
                                 </ul>
                             </section>
                             {wallet.connected &&
-                                <form ref={formRef} className="affiliate-registration-form" onSubmit={onAffiliateRegistrationFormSubmit}>
+                                <form className="affiliate-registration-form" onSubmit={onAffiliateRegistrationFormSubmit}>
                                     <input type="hidden" name="owner" value={owner}/>
                                     <input type="hidden" name="candy_machine_id" value={candyMachine}/>
                                     <p>
                                         <button className="button button--hollow">Register as affiliate</button>
                                     </p>
-                                </form>
-                            }
+                                </form>}
                         </div>
 
-                        {affiliateAccounts.length > 0 ?
-                            <section>
-                                <h4>Nb of affiliates: {affiliateAccounts.length}</h4>
-                                <ul>
-                                    {
-                                        affiliateAccounts.map((affiliateAccount, index) =>
-                                            <li key={index}>
-                                                {affiliateAccount.data.affiliate_pubkey.toString()}
-                                            </li>
-                                        )
-                                    }
-                                </ul>
-                            </section>
-                            : null
-                        }
+                        {affiliateAccounts.length > 0 ? <section className="nft-project__affiliates">
+                            <h4>Nb of affiliates: {affiliateAccounts.length}</h4>
+                            <ul>
+                                {affiliateAccounts.map((affiliateAccount, index) => <li key={index}>
+                                    {affiliateAccount.data.affiliate_pubkey.toString()}
+                                </li>)}
+                            </ul>
+                        </section> : null}
                     </div>
-                </section>
+                </>
             }
-        </>
+        </section>
     );
 }

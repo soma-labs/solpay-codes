@@ -5,7 +5,7 @@ import {getBatchProjectData} from "../models/project/get-project-data";
 import getProjects from "../models/project/get-projects";
 import {AuthContext} from "../providers/auth-provider";
 import { PublicKey } from "@solana/web3.js";
-import {ErrorMessageContext} from "../providers/error-message-provider";
+import {PopupMessageContext, PopupMessageTypes} from "../providers/popup-message-provider";
 
 type ProjectsHookReturnType = {
     projects: Project[];
@@ -13,7 +13,7 @@ type ProjectsHookReturnType = {
 };
 
 export default function useProjects(forCurrentAccount: boolean = false): ProjectsHookReturnType {
-    const {setErrorMessage} = useContext(ErrorMessageContext);
+    const {setMessage} = useContext(PopupMessageContext);
     const {wallet, connection} = useContext(AuthContext);
     const [projectsLoading, setProjectsLoading] = useState<boolean>(true);
     const [projects, setProjects] = useState<Project[]>([]);
@@ -26,6 +26,7 @@ export default function useProjects(forCurrentAccount: boolean = false): Project
 
             if (forCurrentAccount) {
                 if (!wallet.publicKey) {
+                    setProjects([]);
                     setProjectsLoading(false);
                     return;
                 }
@@ -37,6 +38,7 @@ export default function useProjects(forCurrentAccount: boolean = false): Project
                 const projectAccounts = await getProjectAccounts(connection, projectAccountOptions);
 
                 if (!projectAccounts.length) {
+                    setProjects([]);
                     setProjectsLoading(false);
                     return;
                 }
@@ -54,7 +56,7 @@ export default function useProjects(forCurrentAccount: boolean = false): Project
                 setProjectsLoading(false);
             } catch (e) {
                 if (e instanceof Error) {
-                    setErrorMessage(e.message);
+                    setMessage(e.message, PopupMessageTypes.Error);
                 } else {
                     console.log(e);
                 }
