@@ -14,8 +14,11 @@ export default function ProjectMint() {
     const {projectLoading, project} = useProject(owner as string, candyMachine as string);
 
     useEffect(() => {
-        console.log(owner, candyMachine, affiliate, router);
-        const url = encodeURIComponent(`solana:${document.location.origin}/api/candy-machine-mint/${owner}/${candyMachine}?affiliate=${affiliate}`);
+        if (!owner || !candyMachine) {
+            return;
+        }
+
+        const url = encodeURIComponent(`solana:${document.location.origin}/api/candy-machine-mint/${owner}/${candyMachine}?affiliate=${affiliate ?? ''}`);
         const qr = createQR(url);
 
         qr.getRawData('png')
@@ -29,7 +32,7 @@ export default function ProjectMint() {
                 reader.readAsDataURL(data);
                 reader.onload = () => setQrImageData(reader.result as string);
             });
-    }, []);
+    }, [owner, candyMachine]);
 
     return (
         <section className="nft-project nft-project--mint d-flex flex-wrap justify-content-center">
