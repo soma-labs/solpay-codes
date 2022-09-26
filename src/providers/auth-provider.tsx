@@ -1,16 +1,17 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import {Connection, PublicKey} from "@solana/web3.js";
 import * as Web3 from "@solana/web3.js";
 import {WalletAdapter} from "@solana/wallet-adapter-base";
+import walletHasAffiliateAccounts from "../program/affiliate-accounts/wallet-has-affiliate-account";
 
 export type AuthContextType = {
     wallet: WalletAdapter,
     connection: Connection,
     login: () => Promise<any>,
     logout: () => Promise<any>,
-    walletHasAffiliateAccounts: boolean,
-    setWalletHasAffiliateAccounts: any,
+    hasAffiliateAccounts: boolean,
+    setHasAffiliateAccounts: any,
 };
 
 export const AuthContext = React.createContext<AuthContextType>({} as AuthContextType);
@@ -24,7 +25,7 @@ export default function AuthProvider({children}: {children: any}) {
     let [, setIsConnected] = useState<boolean>(false);
     let [wallet] = useState<WalletAdapter>(new PhantomWalletAdapter());
     let [connection] = useState<Connection>(defaultConnection);
-    let [walletHasAffiliateAccounts, setWalletHasAffiliateAccounts] = useState<boolean>(false);
+    let [hasAffiliateAccounts, setHasAffiliateAccounts] = useState<boolean>(false);
 
     wallet
         .on('connect', (publicKey: PublicKey) => setIsConnected(true))
@@ -41,11 +42,17 @@ export default function AuthProvider({children}: {children: any}) {
     const defaultAuthContextValue: AuthContextType = {
         wallet,
         connection,
-        walletHasAffiliateAccounts,
-        setWalletHasAffiliateAccounts,
+        hasAffiliateAccounts: hasAffiliateAccounts,
+        setHasAffiliateAccounts: setHasAffiliateAccounts,
         login,
         logout,
     };
+
+    useEffect(() => {
+        (async () => {
+            setHasAffiliateAccounts(await walletHasAffiliateAccounts(wallet, connection));
+        })();
+    }, [wallet.connected]);
 
     return (
         <AuthContext.Provider value={defaultAuthContextValue}>

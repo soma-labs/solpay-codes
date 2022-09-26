@@ -11,7 +11,7 @@ export default function ProjectDetails() {
     const router = useRouter();
     const {owner, candyMachine} = router.query;
     const {setMessage} = useContext(PopupMessageContext);
-    const {wallet, connection, setWalletHasAffiliateAccounts} = useContext(AuthContext);
+    const {wallet, connection, setHasAffiliateAccounts} = useContext(AuthContext);
     const {projectLoading, project, affiliateAccounts} = useProject(owner as string, candyMachine as string);
 
     const onAffiliateRegistrationFormSubmit = async (e: any) => {
@@ -23,7 +23,7 @@ export default function ProjectDetails() {
                 candyMachineId: new PublicKey(candyMachine as string)
             }, wallet, connection);
 
-            setWalletHasAffiliateAccounts(true);
+            setHasAffiliateAccounts(true);
 
             router.push(`/my-earnings`);
         } catch (e: any) {

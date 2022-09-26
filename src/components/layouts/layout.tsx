@@ -9,7 +9,7 @@ import useProjects from "../../hooks/useProjects";
 export default function Layout({ children }: { children: any }) {
     const {
         wallet,
-        walletHasAffiliateAccounts,
+        hasAffiliateAccounts,
         login,
         logout
     } = useContext(AuthContext);
@@ -53,7 +53,7 @@ export default function Layout({ children }: { children: any }) {
                                 <a>Projects</a>
                             </Link>
                         </li>
-                        {walletHasAffiliateAccounts &&
+                        {hasAffiliateAccounts &&
                             <li className="cma-menu__item">
                                 <Link href='/my-earnings'>
                                     <a>My earnings</a>
