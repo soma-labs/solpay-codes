@@ -22,7 +22,8 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                                 <img src={project.projectData?.image_url} className="projects-table__image" alt=""/>
                             </td>
                             <td>
-                                {project.projectData?.title}
+
+                                {project.projectData?.title ?? project.projectAccount.data.candy_machine_id.toString()}
                             </td>
                             <td>
                                 {actions(project)}

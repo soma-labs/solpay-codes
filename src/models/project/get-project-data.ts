@@ -1,7 +1,7 @@
 import {PublicKey} from "@solana/web3.js";
 import ProjectData from "./project-data";
 
-export default async function getProjectData(owner: PublicKey, candyMachineId: PublicKey): Promise<ProjectData> {
+export default async function getProjectData(owner: PublicKey, candyMachineId: PublicKey): Promise<ProjectData|null> {
     return fetch(`${process.env.NEXT_PUBLIC_DATA_API_URL}/projects/${owner.toString()}/${candyMachineId.toString()}`)
         .then(response => {
             if (response.status !== 200) {
@@ -12,6 +12,9 @@ export default async function getProjectData(owner: PublicKey, candyMachineId: P
         })
         .then(jsonResponse => {
             return new ProjectData(jsonResponse.data);
+        })
+        .catch(e => {
+            return null;
         });
 }
 
@@ -24,7 +27,10 @@ export function getOwnerProjectsData(owner: PublicKey): Promise<ProjectData[]> {
 
             return response.json();
         })
-        .then(jsonResponse => jsonResponse.data.map((projectData: any) => new ProjectData(projectData)));
+        .then(jsonResponse => jsonResponse.data.map((projectData: any) => new ProjectData(projectData)))
+        .catch(e => {
+            return [];
+        });
 }
 
 export function getBatchProjectData(accountsInfo: Array<{owner: string, candyMachineId: string}>): Promise<ProjectData[]> {
@@ -49,5 +55,8 @@ export function getBatchProjectData(accountsInfo: Array<{owner: string, candyMac
 
             return response.json();
         })
-        .then(jsonResponse => jsonResponse.data.map((projectData: any) => new ProjectData(projectData)));
+        .then(jsonResponse => jsonResponse.data.map((projectData: any) => new ProjectData(projectData)))
+        .catch(e => {
+            return [];
+        });
 }

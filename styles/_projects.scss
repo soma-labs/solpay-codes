@@ -76,6 +76,13 @@
     }
 }
 
+.nft-project--mint {
+    .nft-project__image-container {
+        width: 512px;
+        height: 512px;
+    }
+}
+
 .projects-table {
     td {
         vertical-align: middle;
@@ -91,4 +98,9 @@
 .cma-project-form {
     width: 25rem;
     max-width: 100%;
+}
+
+.mint-qr-code {
+    width: 512px;
+    height: 512px;
 }

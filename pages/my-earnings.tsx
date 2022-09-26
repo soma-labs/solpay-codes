@@ -71,7 +71,7 @@ export default function MyEarnings() {
                                             <td>
                                                 <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
                                                     <a className="link">
-                                                        {affiliateAccount.project ? affiliateAccount.project.projectData?.title : affiliateAccount.data.candy_machine_id.toString()}
+                                                        {affiliateAccount.project?.projectData?.title ?? affiliateAccount.data.candy_machine_id.toString()}
                                                     </a>
                                                 </Link>
                                             </td>

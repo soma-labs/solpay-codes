@@ -6,7 +6,6 @@ import closeProjectAccount from "../../src/program/project-accounts/close-projec
 import {AuthContext} from "../../src/providers/auth-provider";
 import {useContext, useState} from "react";
 import {PopupMessageContext, PopupMessageTypes} from "../../src/providers/popup-message-provider";
-import ProjectCard from "../../src/components/projects/project-card";
 import Project from "../../src/models/project/project";
 import ProjectsTable from "../../src/components/projects/projects-table";
 

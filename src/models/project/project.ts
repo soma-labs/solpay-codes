@@ -3,9 +3,9 @@ import ProjectData from "./project-data";
 
 export default class Project {
     projectAccount: ProjectAccount;
-    projectData?: ProjectData;
+    projectData: ProjectData | null;
 
-    constructor(projectAccount: ProjectAccount, projectData?: ProjectData) {
+    constructor(projectAccount: ProjectAccount, projectData: ProjectData | null = null) {
         this.projectAccount = projectAccount;
         this.projectData = projectData;
     }

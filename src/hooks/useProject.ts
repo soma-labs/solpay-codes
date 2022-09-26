@@ -66,7 +66,7 @@ export default function useProject(owner: string, candyMachine: string): Project
                 }
             }
         })();
-    }, []);
+    }, [owner, candyMachine]);
 
     return {
         projectLoading,
