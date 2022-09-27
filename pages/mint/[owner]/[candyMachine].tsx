@@ -18,8 +18,8 @@ export default function ProjectMint() {
             return;
         }
 
-        const url = encodeURIComponent(`solana:${document.location.origin}/api/candy-machine-mint/${owner}/${candyMachine}?affiliate=${affiliate ?? ''}`);
-        const qr = createQR(url);
+        const url = encodeURIComponent(`${document.location.origin}/api/candy-machine-mint/${owner}/${candyMachine}?affiliate=${affiliate ?? ''}`);
+        const qr = createQR(`solana:${url}`);
 
         qr.getRawData('png')
             .then(data => {
