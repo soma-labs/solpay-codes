@@ -20,7 +20,7 @@ export default function Layout({ children }: { children: any }) {
         <div className="cma-wrapper d-flex">
             <Head>
                 <title>{process.env.NEXT_PUBLIC_APP_NAME}</title>
-                <link rel="icon" href="/public/favicon.ico"/>
+                <link rel="icon" href="/solpay-codes-favicon.jpg"/>
             </Head>
 
             <main className="cma-main d-flex">
@@ -28,7 +28,7 @@ export default function Layout({ children }: { children: any }) {
                     <nav className="cma-main-navigation d-flex align-items-center justify-content-end">
                         {wallet.connected &&
                             <Link href="/projects/new">
-                                <a className="button button--hollow button--register-project me-3">Register new NFT project</a>
+                                <a className="button button--hollow button--register-project me-3">Register your project</a>
                             </Link>
                         }
                         <button onClick={!wallet.connected ? login : logout} className={`cma-login-button cma-login-button--` + (!wallet.connected ? `login` : `logout`)}>
@@ -39,22 +39,26 @@ export default function Layout({ children }: { children: any }) {
                 </header>
                 <aside className="cma-main__sidebar px-3 pt-3">
                     <div className="cma-main__sidebar__logo mb-5">
+                        <img src="/images/solpay-codes-logo.jpg" alt="" className="cma-logo"/>
                     </div>
                     <ul className="cma-menu d-flex flex-column">
                         {wallet.publicKey?.toString() !== process.env.NEXT_PUBLIC_SOLPAY_ADMIN ? null :
                             <li className="cma-menu__item">
+                                <i className="cma-menu__item__icon fa fa-chart-bar"></i>
                                 <Link href="/admin">
                                     <a>Admin</a>
                                 </Link>
                             </li>
                         }
                         <li className="cma-menu__item">
+                            <i className="cma-menu__item__icon fa fa-list"></i>
                             <Link href='/'>
                                 <a>Projects</a>
                             </Link>
                         </li>
                         {hasAffiliateAccounts &&
                             <li className="cma-menu__item">
+                                <i className="cma-menu__item__icon fa fa-sack-dollar"></i>
                                 <Link href='/my-earnings'>
                                     <a>My earnings</a>
                                 </Link>

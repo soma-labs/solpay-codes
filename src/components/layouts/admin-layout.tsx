@@ -14,10 +14,8 @@ export default function AdminLayout({children}: {children?: ReactNode}) {
 
     return (
         wallet.connected && wallet.publicKey?.toString() === process.env.NEXT_PUBLIC_SOLPAY_ADMIN ?
-            <section className="admin d-flex justify-content-center">
-                <div className="admin__content col">
-                    {children}
-                </div>
+            <section className="admin">
+                {children}
             </section>
             : <h3>You cannot access this area.</h3>
     );
