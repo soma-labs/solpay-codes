@@ -24,6 +24,8 @@ export default function useProject(owner: string, candyMachine: string): Project
     useEffect(() => {
         (async () => {
             if (!owner || !candyMachine) {
+                setProject(null);
+                setProjectLoading(false);
                 return;
             }
 
@@ -46,17 +48,18 @@ export default function useProject(owner: string, candyMachine: string): Project
                     candyMachinePubkey,
                 );
                 const project = new Project(projectAccount, projectData);
+                const affiliateAccounts = await getAffiliateAccounts(
+                    connection,
+                    {
+                        owner: ownerPubkey,
+                        candyMachineId: candyMachinePubkey,
+                    }
+                );
+
+                affiliateAccounts.forEach(affiliateAccount => affiliateAccount.setAssociatedProject(project));
 
                 setProject(project);
-                setAffiliateAccounts(
-                    await getAffiliateAccounts(
-                        connection,
-                        {
-                            owner: ownerPubkey,
-                            candyMachineId: candyMachinePubkey,
-                        }
-                    )
-                );
+                setAffiliateAccounts(affiliateAccounts);
                 setProjectLoading(false);
             } catch (e) {
                 if (e instanceof Error) {

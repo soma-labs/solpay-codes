@@ -1,4 +1,4 @@
-import Project from "../../models/project/project";
+import Project from "../../../models/project/project";
 
 export default function ProjectsTable({projects, actions}: {projects: Project[], actions: any}) {
     return (

@@ -57,15 +57,15 @@ export default function MyPendingProject() {
     return (
         <>
             {!projectData ? null :
-                <section className="nft-project nft-project--details">
+                <section className="nft-project nft-project--single">
                     <div className="d-flex flex-wrap">
-                        <div className="col-3">
+                        <div className="col-12 col-md-3">
                             <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
                                 {projectData?.image_url &&
                                     <img src={projectData?.image_url} className="nft-project__image" alt=""/>}
                             </div>
                         </div>
-                        <div className="col ps-4">
+                        <div className="col ps-md-4">
                             <header className="nft-project__header mb-5">
                                 <h1 className="nft-project__title">
                                     {projectData.title || `Candy Machine: ${candyMachine}`}

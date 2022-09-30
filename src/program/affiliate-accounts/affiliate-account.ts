@@ -6,6 +6,7 @@ import Project from '../../models/project/project';
 import getProjectData from "../../models/project/get-project-data";
 
 export const AffiliateAccountDiscriminator = 'affiliate_account';
+const AffiliateAccountRentInSol = 0.00171912;
 
 export type AffiliateAccountPropsType = {
     discriminator: string;
@@ -85,7 +86,7 @@ export default class AffiliateAccount {
             return false;
         }
 
-        return this.lamports / LAMPORTS_PER_SOL >= this.project.projectAccount.data.redeem_threshold_in_sol;
+        return (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) >= this.project.projectAccount.data.redeem_threshold_in_sol;
     }
 
     targetProgress(): string {
@@ -93,7 +94,7 @@ export default class AffiliateAccount {
             return '0';
         }
 
-        return (100 * (this.lamports / LAMPORTS_PER_SOL) / this.project.projectAccount.data.redeem_threshold_in_sol).toFixed(2);
+        return (100 * (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) / this.project.projectAccount.data.redeem_threshold_in_sol).toFixed(2);
     }
 
     static deserialize(account: AccountInfo<Buffer>): AffiliateAccount | null {

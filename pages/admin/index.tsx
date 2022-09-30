@@ -7,7 +7,7 @@ import {AuthContext} from "../../src/providers/auth-provider";
 import {useContext, useState} from "react";
 import {PopupMessageContext, PopupMessageTypes} from "../../src/providers/popup-message-provider";
 import Project from "../../src/models/project/project";
-import ProjectsTable from "../../src/components/projects/projects-table";
+import ProjectsTable from "../../src/components/admin/projects/projects-table";
 
 export default function Admin() {
     const {setMessage} = useContext(PopupMessageContext);

@@ -77,10 +77,31 @@
     }
 }
 
+.nft-project--single {
+    .nft-project__image-container {
+        height: 25rem;
+        overflow: hidden;
+    }
+
+    .nft-project__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
 .nft-project--mint {
     .nft-project__image-container {
+        max-width: 100%;
         width: 512px;
         height: 512px;
+        overflow: hidden;
+    }
+
+    .nft-project__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 }
 
@@ -102,6 +123,7 @@
 }
 
 .mint-qr-code {
+    max-width: 100%;
     width: 512px;
     height: 512px;
 }

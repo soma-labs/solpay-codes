@@ -40,7 +40,7 @@ export default function ProjectDetails() {
     return (
         <>
             {projectLoading ? <LoadingIcon/>: !project ? null :
-                <section className="nft-project nft-project--details">
+                <section className="nft-project nft-project--single">
                     <div className="d-flex flex-wrap mb-3">
                         <div className="col-3">
                             <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
@@ -48,7 +48,7 @@ export default function ProjectDetails() {
                                     <img src={project.projectData?.image_url} className="nft-project__image" alt=""/>}
                             </div>
                         </div>
-                        <div className="col ps-4">
+                        <div className="col ps-md-4">
                             <header className="nft-project__header mb-5">
                                 <h1 className="nft-project__title">
                                     {project.projectData?.title || `Candy Machine: ${candyMachine}`}
@@ -82,7 +82,7 @@ export default function ProjectDetails() {
                         <h4>Nb of affiliates: {affiliateAccounts.length}</h4>
                         <ul>
                             {affiliateAccounts.map((affiliateAccount, index) => <li key={index}>
-                                {affiliateAccount.data.affiliate_pubkey.toString()}
+                                <span className="pubkey">{affiliateAccount.data.affiliate_pubkey.toString()}</span>
                             </li>)}
                         </ul>
                     </section> : null}

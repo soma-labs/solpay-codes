@@ -1,10 +1,10 @@
-import AffiliateAccount from "../../program/affiliate-accounts/affiliate-account";
+import AffiliateAccount from "../../../program/affiliate-accounts/affiliate-account";
 import {useContext, useEffect, useState} from "react";
-import {PopupMessageContext, PopupMessageTypes} from "../../providers/popup-message-provider";
-import {AuthContext} from "../../providers/auth-provider";
-import closeAffiliateAccount from "../../program/affiliate-accounts/close-affiliate-account";
+import {PopupMessageContext, PopupMessageTypes} from "../../../providers/popup-message-provider";
+import {AuthContext} from "../../../providers/auth-provider";
+import closeAffiliateAccount from "../../../program/affiliate-accounts/close-affiliate-account";
 import {PublicKey} from "@solana/web3.js";
-import getAffiliateAccounts from "../../program/affiliate-accounts/get-affiliate-accounts";
+import getAffiliateAccounts from "../../../program/affiliate-accounts/get-affiliate-accounts";
 
 export default function ProjectAffiliates({owner, candyMachine, defaultAffiliateAccounts}: {
     owner: string,
@@ -74,7 +74,7 @@ export default function ProjectAffiliates({owner, candyMachine, defaultAffiliate
                                 affiliateAccounts.map((affiliateAccount, index) =>
                                     <tr key={index}>
                                         <td>{index + 1}</td>
-                                        <td>{affiliateAccount.data.affiliate_pubkey.toString()}</td>
+                                        <td><span className="pubkey">{affiliateAccount.data.affiliate_pubkey.toString()}</span></td>
                                         <td>{affiliateAccount.targetProgress()}%</td>
                                         <td>
                                             <button

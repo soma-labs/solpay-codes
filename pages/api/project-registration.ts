@@ -13,6 +13,8 @@ type RecaptchaResponseType = {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
         res.status(400).end();
+
+        return;
     }
 
     const recaptchaVerificationResponse = await fetch(`${GOOGLE_RECAPTCHA_VERIFY_URL}?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${req.body.token}`, {
@@ -22,6 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!recaptchaVerificationJsonResponse.success) {
         res.status(400).end();
+
+        return;
     }
 
     const formData = new FormData();
@@ -49,6 +53,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         res.status(400).end();
+
+        return;
     }
 
     const jsonProjectRegistrationResponse: RecaptchaResponseType = await projectRegistrationResponse.json();

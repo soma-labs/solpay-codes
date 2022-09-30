@@ -1,5 +1,5 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {PublicKey, SystemProgram, Transaction} from "@solana/web3.js";
+import {Keypair, PublicKey, SystemProgram, Transaction} from "@solana/web3.js";
 import getProjectAccount from "../program/project-accounts/get-project-account";
 import getProjectData from "../models/project/get-project-data";
 import Project from "../models/project/project";
@@ -7,17 +7,29 @@ import * as Web3 from "@solana/web3.js";
 import * as anchor from '@project-serum/anchor';
 import {getCandyMachineAccount, mintOneToken} from "./candy-machine";
 import getAffiliateAccountAddress from "../program/affiliate-accounts/get-affiliate-account-address";
+import {createMintToCheckedInstruction, getAssociatedTokenAddress} from "@solana/spl-token";
 
 const SOLPAY_TREASURY = process.env.NEXT_PUBLIC_SOLPAY_TREASURY as string;
-const SOLPAY_FEE_NORMAL_MINT = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_NORMAL_MINT as string);
-const SOLPAY_FEE_AFFILIATE_MINT = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_AFFILIATE_MINT as string);
+const SOLPAY_FEE_NORMAL_MINT_PERCENTAGE = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_NORMAL_MINT_PERCENTAGE as string);
+const SOLPAY_FEE_AFFILIATE_MINT_PERCENTAGE = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_AFFILIATE_MINT_PERCENTAGE as string);
+const WHITELIST_TOKEN_MINT = new PublicKey(process.env.WHITELIST_TOKEN_MINT as string);
+const WHITELIST_AUTHORITY_KEYPAIR = Keypair.fromSecretKey(
+    Uint8Array.from(JSON.parse(process.env.WHITELIST_TOKEN_MINT_AUTHORITY as string))
+);
 
 const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiResponse) => {
+    const {owner, candyMachine, affiliate} = req.query;
+
+    if (!owner || !candyMachine || !req.body.account) {
+        res.status(400).end();
+
+        return;
+    }
+
     const connection = new Web3.Connection(
         process.env.NEXT_PUBLIC_CLUSTER_URL ? process.env.NEXT_PUBLIC_CLUSTER_URL : Web3.clusterApiUrl('devnet'),
         'confirmed'
     );
-    const { owner, candyMachine, affiliate } = req.query;
     const ownerPubkey = new PublicKey(owner as string);
     const candyMachinePubkey = new PublicKey(candyMachine as string);
     const walletPublicKey = new anchor.web3.PublicKey(req.body.account);
@@ -50,14 +62,17 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
         return;
     }
 
-    const [instructions, signers, nftPrice] = await mintOneToken(
+    let [instructions, signers, nftPrice] = await mintOneToken(
         candyMachineAccount,
         walletPublicKey,
     );
 
-    let solpayFeePercentage = SOLPAY_FEE_NORMAL_MINT;
+    let solpayFee = SOLPAY_FEE_NORMAL_MINT_PERCENTAGE * parseInt(nftPrice.toString()) / 100;
 
-    if (affiliate) {
+    if (affiliate
+        && candyMachineAccount.state.whitelistMintSettings !== null
+        && candyMachineAccount.state.whitelistMintSettings.discountPrice !== null
+    ) {
         const affiliateAccountAddress = await getAffiliateAccountAddress(
             new PublicKey(affiliate),
             ownerPubkey,
@@ -66,12 +81,29 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
         );
 
         if (affiliateAccountAddress !== null) {
-            solpayFeePercentage = SOLPAY_FEE_AFFILIATE_MINT;
+            const whitelistNftPrice = candyMachineAccount.state.whitelistMintSettings.discountPrice.toNumber();
+            solpayFee = SOLPAY_FEE_AFFILIATE_MINT_PERCENTAGE * whitelistNftPrice / 100;
+
+            let walletWhitelistAta = await getAssociatedTokenAddress(
+                WHITELIST_TOKEN_MINT,
+                walletPublicKey, // fee payer
+            );
+
+            const whitelistTokenTransferInstruction = await createMintToCheckedInstruction(
+                WHITELIST_TOKEN_MINT, // mint
+                walletWhitelistAta, // receiver (should be a token account)
+                WHITELIST_AUTHORITY_KEYPAIR.publicKey, // mint authority
+                1, // amount. if your decimals is 8, you mint 10^8 for 1 token.
+                9 // decimals
+            );
+
+            instructions.unshift(whitelistTokenTransferInstruction);
+            signers = [WHITELIST_AUTHORITY_KEYPAIR, ...signers];
 
             const affiliateWalletFeeInstruction = SystemProgram.transfer({
                 fromPubkey: walletPublicKey,
                 toPubkey: affiliateAccountAddress,
-                lamports: project.projectAccount.data.affiliate_fee_percentage * parseInt(nftPrice.toString()) / 100,
+                lamports: project.projectAccount.data.affiliate_fee_percentage * whitelistNftPrice / 100,
             });
 
             instructions.unshift(affiliateWalletFeeInstruction);
@@ -81,7 +113,7 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
     const solpayFeeInstruction = SystemProgram.transfer({
         fromPubkey: walletPublicKey,
         toPubkey: new PublicKey(SOLPAY_TREASURY),
-        lamports: solpayFeePercentage * parseInt(nftPrice.toString()) / 100,
+        lamports: solpayFee,
     });
 
     instructions.unshift(solpayFeeInstruction);

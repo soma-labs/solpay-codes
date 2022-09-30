@@ -73,7 +73,7 @@ export default function Projects() {
                     <p>
                         <label className="form-label w-100">
                             <span className="d-inline-block mb-1">Project description</span>
-                            <textarea name="description" className="form-control w-100"></textarea>
+                            <textarea name="description" className="form-control w-100" maxLength={255}></textarea>
                         </label>
                     </p>
                     <p>
