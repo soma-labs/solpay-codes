@@ -20,7 +20,7 @@ export default function Layout({ children }: { children: any }) {
         <div className="cma-wrapper d-flex">
             <Head>
                 <title>{process.env.NEXT_PUBLIC_APP_NAME}</title>
-                <link rel="icon" href="/public/solpay-codes-favicon.jpg"/>
+                <link rel="icon" href="/solpay-codes-favicon.jpg"/>
             </Head>
 
             <main className="cma-main d-flex">
