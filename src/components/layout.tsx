@@ -1,26 +1,26 @@
 import Head from "next/head";
-import Image from "next/image";
-import {AuthContext} from "../../providers/auth-provider";
+import {AuthContext} from "../providers/auth-provider";
 import {useContext} from "react";
 import Link from "next/link";
-import usePendingProjects from "../../hooks/usePendingProjects";
-import useProjects from "../../hooks/useProjects";
+import {WalletPendingProjectsContext} from "../providers/wallet-pending-projects-provider";
+import {WalletProjectsContext} from "../providers/wallet-projects-provider";
+import {WalletAffiliateAccountsContext} from "../providers/wallet-affiliate-accounts-provider";
 
 export default function Layout({ children }: { children: any }) {
     const {
         wallet,
-        hasAffiliateAccounts,
         login,
         logout
     } = useContext(AuthContext);
-    const {pendingProjects} = usePendingProjects();
-    const {projects} = useProjects(true);
+    const {walletProjects} = useContext(WalletProjectsContext);
+    const {pendingProjects} = useContext(WalletPendingProjectsContext);
+    const {walletHasAffiliateAccounts} = useContext(WalletAffiliateAccountsContext);
 
     return (
         <div className="cma-wrapper d-flex">
             <Head>
                 <title>{process.env.NEXT_PUBLIC_APP_NAME}</title>
-                <link rel="icon" href="/solpay-codes-favicon.jpg"/>
+                <link rel="icon" href="/public/solpay-codes-favicon.jpg"/>
             </Head>
 
             <main className="cma-main d-flex">
@@ -31,15 +31,18 @@ export default function Layout({ children }: { children: any }) {
                                 <a className="button button--hollow button--register-project me-3">Register your project</a>
                             </Link>
                         }
-                        <button onClick={!wallet.connected ? login : logout} className={`cma-login-button cma-login-button--` + (!wallet.connected ? `login` : `logout`)}>
-                            <Image src={wallet.icon} alt="" width={32} height={32}/>
+                        <button onClick={!wallet.connected ? login : logout} className={`cma-login-button cma-login-button--${!wallet.connected ? `login` : `logout`}`}>
                             {!wallet.connected ? `Login with wallet` : `Logout`}
                         </button>
                     </nav>
                 </header>
                 <aside className="cma-main__sidebar px-3 pt-3">
                     <div className="cma-main__sidebar__logo mb-5">
-                        <img src="/images/solpay-codes-logo.jpg" alt="" className="cma-logo"/>
+                        <Link href="/">
+                            <a>
+                                <img src="/images/solpay-codes-logo.jpg" alt="" className="cma-logo"/>
+                            </a>
+                        </Link>
                     </div>
                     <ul className="cma-menu d-flex flex-column">
                         {wallet.publicKey?.toString() !== process.env.NEXT_PUBLIC_SOLPAY_ADMIN ? null :
@@ -56,7 +59,7 @@ export default function Layout({ children }: { children: any }) {
                                 <a>Projects</a>
                             </Link>
                         </li>
-                        {hasAffiliateAccounts &&
+                        {walletHasAffiliateAccounts &&
                             <li className="cma-menu__item">
                                 <i className="cma-menu__item__icon fa fa-sack-dollar"></i>
                                 <Link href='/my-earnings'>
@@ -80,11 +83,11 @@ export default function Layout({ children }: { children: any }) {
                             </ul>
                         </> : null
                     }
-                    {wallet.connected && projects.length ?
+                    {wallet.connected && walletProjects.length ?
                         <>
                             <span className="cma-menu-name">My Projects</span>
                             <ul className="cma-menu d-flex flex-column">
-                                {projects.map(
+                                {walletProjects.map(
                                     (project, index) =>
                                         <li key={index} className="cma-menu__item">
                                             <Link href={`/my-projects/${project.projectAccount.data.candy_machine_id.toString()}`}>

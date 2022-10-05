@@ -1,14 +1,22 @@
-import {AccountInfo, Connection, PublicKey} from "@solana/web3.js";
+import {Connection, PublicKey} from "@solana/web3.js";
 import {CmaProgramId} from "../constants";
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 import ProjectAccount, {ProjectAccountDiscriminator} from "./project-account";
+import {getPaginatedAccounts, PaginationOptionsType, PaginationType} from "../pagination-utils";
+
+export type GetProjectAccountsOptionsType = {
+    owner?: PublicKey,
+} & PaginationOptionsType;
+
+export type GetProjectAccountsReturnType = {
+    items: ProjectAccount[],
+    pagination: PaginationType
+};
 
 const getProjectAccounts = async (
     connection: Connection,
-    options?: {
-        owner?: PublicKey
-    }
-): Promise<ProjectAccount[]> => {
+    options?: GetProjectAccountsOptionsType
+): Promise<GetProjectAccountsReturnType> => {
     let filters = [
         {
             memcmp: {
@@ -41,13 +49,21 @@ const getProjectAccounts = async (
     );
 
     const accountKeys = accountsWithoutData.map(account => account.pubkey);
-    // TODO: implement pagination
-    const accounts = await connection.getMultipleAccountsInfo(accountKeys.slice(0, 100));
+    const paginatedAccounts = await getPaginatedAccounts(
+        connection,
+        accountKeys,
+        {
+            page: options?.page,
+            perPage: options?.perPage
+        }
+    );
 
-    return ((accounts
-        .filter(account => account !== null) as AccountInfo<Buffer>[])
-        .map(account => ProjectAccount.deserialize(account?.data))
-        .filter(projectAccount => projectAccount !== null) as ProjectAccount[]);
+    return {
+        items: (paginatedAccounts.items
+            .map(account => ProjectAccount.deserialize(account?.data))
+            .filter(projectAccount => projectAccount !== null) as ProjectAccount[]),
+        pagination: paginatedAccounts.pagination
+    };
 };
 
 export default getProjectAccounts;

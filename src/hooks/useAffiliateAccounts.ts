@@ -1,26 +1,35 @@
 import {useContext, useEffect, useState} from "react";
-import getAffiliateAccounts, {AffiliateAccountsOptionsType} from "../program/affiliate-accounts/get-affiliate-accounts";
+import getAffiliateAccounts, {GetAffiliateAccountsOptionsType} from "../program/affiliate-accounts/get-affiliate-accounts";
 import {AuthContext} from "../providers/auth-provider";
 import AffiliateAccount from "../program/affiliate-accounts/affiliate-account";
 import {PublicKey} from "@solana/web3.js";
-
-type AffiliateAccountHookReturnType = {
-    affiliateAccountsLoading: boolean;
-    affiliateAccounts: AffiliateAccount[];
-};
+import {PopupMessageContext, PopupMessageTypes} from "../providers/popup-message-provider";
+import {DefaultPaginationOptions, PaginationOptionsType, PaginationType} from "../program/pagination-utils";
 
 type AffiliateAccountsHookOptionsType = {
     project?: {
         owner: string,
         candyMachineId: string,
     },
-    affiliate?: string,
+    affiliate?: string
 };
 
-export default function useAffiliateAccounts(options: AffiliateAccountsHookOptionsType): AffiliateAccountHookReturnType {
+type AffiliateAccountHookReturnType = {
+    affiliateAccountsLoading: boolean;
+    affiliateAccounts: AffiliateAccount[];
+    pagination: PaginationType,
+};
+
+export default function useAffiliateAccounts(
+    options: AffiliateAccountsHookOptionsType,
+    refresh: number = 0,
+    paginationOptions: PaginationOptionsType = DefaultPaginationOptions
+): AffiliateAccountHookReturnType {
     const {wallet, connection} = useContext(AuthContext);
+    const {setMessage} = useContext(PopupMessageContext);
     const [affiliateAccountsLoading, setAffiliateAccountsLoading] = useState<boolean>(true);
     const [affiliateAccounts, setAffiliateAccounts] = useState<AffiliateAccount[]>([]);
+    const [pagination, setPagination] = useState<PaginationType>({} as PaginationType);
 
     useEffect(() => {
         (async () => {
@@ -30,33 +39,56 @@ export default function useAffiliateAccounts(options: AffiliateAccountsHookOptio
                 return;
             }
 
-            const affiliateAccountsOptions: AffiliateAccountsOptionsType = {};
+            setAffiliateAccountsLoading(true);
 
-            if (options.affiliate) {
-                affiliateAccountsOptions.affiliate = new PublicKey(options.affiliate);
+            const affiliateAccountsOptions: GetAffiliateAccountsOptionsType = {};
+
+            if (paginationOptions.page) {
+                affiliateAccountsOptions.page = paginationOptions.page;
             }
 
-            if (options.project) {
-                affiliateAccountsOptions.owner = new PublicKey(options.project.owner as string);
-                affiliateAccountsOptions.candyMachineId = new PublicKey(options.project.candyMachineId as string);
+            if (paginationOptions.perPage) {
+                affiliateAccountsOptions.perPage = paginationOptions.perPage;
             }
 
-            const affiliateAccounts = await getAffiliateAccounts(
-                connection,
-                affiliateAccountsOptions
-            );
+            try {
+                if (options.affiliate) {
+                    affiliateAccountsOptions.affiliate = new PublicKey(options.affiliate);
+                }
 
-            for (let i = affiliateAccounts.length - 1; i >= 0; i--) {
-                await affiliateAccounts[i].getAssociatedProject(connection);
+                if (options.project) {
+                    affiliateAccountsOptions.owner = new PublicKey(options.project.owner as string);
+                    affiliateAccountsOptions.candyMachineId = new PublicKey(options.project.candyMachineId as string);
+                }
+
+                const affiliateAccounts = await getAffiliateAccounts(
+                    connection,
+                    affiliateAccountsOptions
+                );
+
+                for (let i = affiliateAccounts.items.length - 1; i >= 0; i--) {
+                    await affiliateAccounts.items[i].getAssociatedProject(connection);
+                }
+
+                setAffiliateAccounts(affiliateAccounts.items);
+                setPagination(affiliateAccounts.pagination);
+                setAffiliateAccountsLoading(false);
+            } catch (e) {
+                if (e instanceof Error) {
+                    setMessage(e.message, PopupMessageTypes.Error);
+                } else {
+                    console.log(e);
+                }
+
+                setAffiliateAccounts([]);
+                setAffiliateAccountsLoading(false);
             }
-
-            setAffiliateAccounts(affiliateAccounts);
-            setAffiliateAccountsLoading(false);
         })();
-    }, [wallet.connected]);
+    }, [wallet.connected, refresh, paginationOptions.page, paginationOptions.perPage]);
 
     return {
         affiliateAccountsLoading,
-        affiliateAccounts
+        affiliateAccounts,
+        pagination,
     };
 }

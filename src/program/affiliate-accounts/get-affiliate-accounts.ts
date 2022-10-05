@@ -1,18 +1,24 @@
-import {AccountInfo, Connection, PublicKey} from "@solana/web3.js";
+import {Connection, PublicKey} from "@solana/web3.js";
 import AffiliateAccount, {AffiliateAccountDiscriminator} from "./affiliate-account";
 import {CmaProgramId} from "../constants";
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes";
+import {getPaginatedAccounts, PaginationOptionsType, PaginationType} from "../pagination-utils";
 
-export type AffiliateAccountsOptionsType = {
+export type GetAffiliateAccountsOptionsType = {
     affiliate?: PublicKey,
     owner?: PublicKey,
     candyMachineId?: PublicKey,
-};
+} & PaginationOptionsType;
+
+export type GetAffiliateAccountsReturnType = {
+    items: AffiliateAccount[],
+    pagination: PaginationType
+}
 
 const getAffiliateAccounts = async (
     connection: Connection,
-    options?: AffiliateAccountsOptionsType
-): Promise<AffiliateAccount[]> => {
+    options?: GetAffiliateAccountsOptionsType
+): Promise<GetAffiliateAccountsReturnType> => {
     let filters = [
         {
             memcmp: {
@@ -70,13 +76,21 @@ const getAffiliateAccounts = async (
     );
 
     const accountKeys = accountsWithoutData.map(account => account.pubkey);
-    // TODO: implement pagination
-    const accounts = await connection.getMultipleAccountsInfo(accountKeys.slice(0, 100));
+    const paginatedAccounts = await getPaginatedAccounts(
+        connection,
+        accountKeys,
+        {
+            page: options?.page,
+            perPage: options?.perPage
+        }
+    );
 
-    return ((accounts
-        .filter(account => account !== null) as AccountInfo<Buffer>[])
-        .map(account => AffiliateAccount.deserialize(account))
-        .filter(affiliateAccount => affiliateAccount !== null) as AffiliateAccount[]);
+    return {
+        items: (paginatedAccounts.items
+            .map(account => AffiliateAccount.deserialize(account))
+            .filter(affiliateAccount => affiliateAccount !== null) as AffiliateAccount[]),
+        pagination: paginatedAccounts.pagination
+    };
 };
 
 export default getAffiliateAccounts;

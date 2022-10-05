@@ -6,13 +6,15 @@ import {useContext} from "react";
 import {AuthContext} from "../../../src/providers/auth-provider";
 import {PopupMessageContext, PopupMessageTypes} from "../../../src/providers/popup-message-provider";
 import LoadingIcon from "../../../src/components/loading-icon";
+import {WalletAffiliateAccountsContext} from "../../../src/providers/wallet-affiliate-accounts-provider";
 
 export default function ProjectDetails() {
     const router = useRouter();
     const {owner, candyMachine} = router.query;
     const {setMessage} = useContext(PopupMessageContext);
-    const {wallet, connection, setHasAffiliateAccounts} = useContext(AuthContext);
-    const {projectLoading, project, affiliateAccounts} = useProject(owner as string, candyMachine as string);
+    const {wallet, connection} = useContext(AuthContext);
+    const {refreshWalletHasAffiliateAccounts} = useContext(WalletAffiliateAccountsContext);
+    const {projectLoading, project, affiliateAccounts} = useProject(owner as string, candyMachine as string, true);
 
     const onAffiliateRegistrationFormSubmit = async (e: any) => {
         e.preventDefault();
@@ -23,17 +25,15 @@ export default function ProjectDetails() {
                 candyMachineId: new PublicKey(candyMachine as string)
             }, wallet, connection);
 
-            setHasAffiliateAccounts(true);
+            refreshWalletHasAffiliateAccounts();
 
             router.push(`/my-earnings`);
         } catch (e: any) {
             if (e instanceof Error) {
                 setMessage(e.message, PopupMessageTypes.Error);
-
-                return;
+            } else {
+                console.log(e);
             }
-
-            console.log(e);
         }
     };
 

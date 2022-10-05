@@ -83,7 +83,7 @@ const closeProjectAccount = async (
 
     transaction.add(closureInstruction);
 
-    const signature = await wallet.sendTransaction(transaction, connection, {skipPreflight: true});
+    const signature = await wallet.sendTransaction(transaction, connection); // {skipPreflight: true}
     const latestBlockHash = await connection.getLatestBlockhash();
 
     if (!connection.rpcEndpoint.includes('localhost')) {

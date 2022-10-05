@@ -3,7 +3,7 @@ import {AuthContext} from "../../../../src/providers/auth-provider";
 import {PopupMessageContext, PopupMessageTypes} from "../../../../src/providers/popup-message-provider";
 import {useRouter} from "next/router";
 import {PublicKey} from "@solana/web3.js";
-import AdminLayout from "../../../../src/components/layouts/admin-layout";
+import AdminLayout from "../../../../src/components/admin/admin-layout";
 import updateProjectAccount from "../../../../src/program/project-accounts/update-project-account";
 import useProject from "../../../../src/hooks/useProject";
 import LoadingIcon from "../../../../src/components/loading-icon";
@@ -16,7 +16,7 @@ export default function AdminProjectDetails() {
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
     const {owner, candyMachine} = router.query;
-    const {projectLoading, project, affiliateAccounts} = useProject(owner as string, candyMachine as string);
+    const {projectLoading, project} = useProject(owner as string, candyMachine as string, false);
 
     const onProjectUpdateFormSubmit = async (e: any) => {
         e.preventDefault();
@@ -105,7 +105,6 @@ export default function AdminProjectDetails() {
                     <ProjectAffiliates
                         owner={owner as string}
                         candyMachine={candyMachine as string}
-                        defaultAffiliateAccounts={affiliateAccounts}
                     />
                 </section>
             }

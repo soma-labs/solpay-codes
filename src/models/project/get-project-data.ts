@@ -10,10 +10,9 @@ export default async function getProjectData(owner: PublicKey, candyMachineId: P
 
             return response.json();
         })
-        .then(jsonResponse => {
-            return new ProjectData(jsonResponse.data);
-        })
+        .then(jsonResponse => new ProjectData(jsonResponse.data))
         .catch(e => {
+            //console.log(e);
             return null;
         });
 }
@@ -29,6 +28,7 @@ export function getOwnerProjectsData(owner: PublicKey): Promise<ProjectData[]> {
         })
         .then(jsonResponse => jsonResponse.data.map((projectData: any) => new ProjectData(projectData)))
         .catch(e => {
+            //console.log(e);
             return [];
         });
 }
@@ -57,6 +57,7 @@ export function getBatchProjectData(accountsInfo: Array<{owner: string, candyMac
         })
         .then(jsonResponse => jsonResponse.data.map((projectData: any) => new ProjectData(projectData)))
         .catch(e => {
+            //console.log(e);
             return [];
         });
 }

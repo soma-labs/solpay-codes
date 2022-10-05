@@ -1,10 +1,11 @@
 import LoadingIcon from "../../src/components/loading-icon";
 import Link from "next/link";
 import ProjectCard from "../../src/components/projects/project-card";
-import usePendingProjects from "../../src/hooks/usePendingProjects";
+import {useContext} from "react";
+import {WalletPendingProjectsContext} from "../../src/providers/wallet-pending-projects-provider";
 
 export default function MyPendingProjects() {
-    const {pendingProjectsLoading, pendingProjects} = usePendingProjects();
+    const {pendingProjectsLoading, pendingProjects} = useContext(WalletPendingProjectsContext);
 
     return (
         <section className="nft-projects d-flex flex-wrap">
@@ -18,7 +19,7 @@ export default function MyPendingProjects() {
                             description={project?.description}
                             imageUrl={project?.image_url}
                             actions={[
-                                <Link key={0} href={`/my-account/pending-projects/${project.candy_machine_id.toString()}`}>
+                                <Link key={0} href={`/my-pending-projects/${project.candy_machine_id.toString()}`}>
                                     <a className="button button--hollow">Finish registration</a>
                                 </Link>
                             ]}

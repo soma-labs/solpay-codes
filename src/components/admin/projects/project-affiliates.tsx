@@ -1,20 +1,30 @@
 import AffiliateAccount from "../../../program/affiliate-accounts/affiliate-account";
-import {useContext, useEffect, useState} from "react";
+import {useContext, useState} from "react";
 import {PopupMessageContext, PopupMessageTypes} from "../../../providers/popup-message-provider";
 import {AuthContext} from "../../../providers/auth-provider";
 import closeAffiliateAccount from "../../../program/affiliate-accounts/close-affiliate-account";
-import {PublicKey} from "@solana/web3.js";
-import getAffiliateAccounts from "../../../program/affiliate-accounts/get-affiliate-accounts";
+import useAffiliateAccounts from "../../../hooks/useAffiliateAccounts";
 
-export default function ProjectAffiliates({owner, candyMachine, defaultAffiliateAccounts}: {
+export default function ProjectAffiliates({owner, candyMachine}: {
     owner: string,
     candyMachine: string,
-    defaultAffiliateAccounts: AffiliateAccount[]
 }) {
     const {setMessage} = useContext(PopupMessageContext);
     const {wallet, connection} = useContext(AuthContext);
     const [refreshAffiliateAccounts, setRefreshAffiliateAccounts] = useState<number>(Date.now());
-    const [affiliateAccounts, setAffiliateAccounts] = useState<AffiliateAccount[]>(defaultAffiliateAccounts);
+    const {affiliateAccounts} = useAffiliateAccounts(
+        {
+            project: {
+                owner: owner,
+                candyMachineId: candyMachine,
+            },
+        },
+        refreshAffiliateAccounts,
+        // TODO: Implement pagination when list becomes too long
+        {
+            perPage: -1
+        }
+    );
 
     const onCloseAffiliateAccountAction = async (affiliateAccount: AffiliateAccount) => {
         try {
@@ -33,27 +43,6 @@ export default function ProjectAffiliates({owner, candyMachine, defaultAffiliate
             }
         }
     };
-
-    useEffect(() => {
-        (async () => {
-            if (!owner || !candyMachine) {
-                return;
-            }
-
-            const ownerPubkey = new PublicKey(owner as string);
-            const candyMachinePubkey = new PublicKey(candyMachine as string);
-
-            setAffiliateAccounts(
-                await getAffiliateAccounts(
-                    connection,
-                    {
-                        owner: ownerPubkey,
-                        candyMachineId: candyMachinePubkey,
-                    }
-                )
-            );
-        })();
-    }, [refreshAffiliateAccounts]);
 
     return (
         <>

@@ -14,7 +14,7 @@ type ProjectHookReturnType = {
     affiliateAccounts: AffiliateAccount[];
 };
 
-export default function useProject(owner: string, candyMachine: string): ProjectHookReturnType {
+export default function useProject(owner: string, candyMachine: string, includeAffiliateAccounts: boolean = false): ProjectHookReturnType {
     const {setMessage} = useContext(PopupMessageContext);
     const {connection} = useContext(AuthContext);
     const [projectLoading, setProjectLoading] = useState<boolean>(true);
@@ -48,18 +48,23 @@ export default function useProject(owner: string, candyMachine: string): Project
                     candyMachinePubkey,
                 );
                 const project = new Project(projectAccount, projectData);
-                const affiliateAccounts = await getAffiliateAccounts(
-                    connection,
-                    {
-                        owner: ownerPubkey,
-                        candyMachineId: candyMachinePubkey,
-                    }
-                );
 
-                affiliateAccounts.forEach(affiliateAccount => affiliateAccount.setAssociatedProject(project));
+                if (includeAffiliateAccounts) {
+                    const affiliateAccounts = await getAffiliateAccounts(
+                        connection,
+                        {
+                            owner: ownerPubkey,
+                            candyMachineId: candyMachinePubkey,
+                            // TODO: Implement pagination when list becomes too long
+                            perPage: -1
+                        }
+                    );
+
+                    affiliateAccounts.items.forEach(affiliateAccount => affiliateAccount.setAssociatedProject(project));
+                    setAffiliateAccounts(affiliateAccounts.items);
+                }
 
                 setProject(project);
-                setAffiliateAccounts(affiliateAccounts);
                 setProjectLoading(false);
             } catch (e) {
                 if (e instanceof Error) {

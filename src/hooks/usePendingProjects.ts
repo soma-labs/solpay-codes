@@ -10,7 +10,7 @@ type PendingProjectsHookReturnType = {
     pendingProjects: ProjectData[];
 };
 
-export default function usePendingProjects(): PendingProjectsHookReturnType {
+export default function usePendingProjects(refresh: number = 0): PendingProjectsHookReturnType {
     const {setMessage} = useContext(PopupMessageContext);
     const {wallet, connection} = useContext(AuthContext);
     const [pendingProjectsLoading, setPendingProjectsLoading] = useState<boolean>(true);
@@ -30,15 +30,18 @@ export default function usePendingProjects(): PendingProjectsHookReturnType {
                 const ownerProjectsData = await getOwnerProjectsData(wallet.publicKey);
                 const ownerProjectAccounts = await getProjectAccounts(connection, {
                     owner: wallet.publicKey,
+                    // TODO: Implement pagination when list becomes too long
+                    perPage: -1
                 });
 
                 ownerProjectsData.forEach(ownerProjectData => {
                     let isPendingProject = true;
 
-                    for (let i = ownerProjectAccounts.length - 1; i >= 0; i--) {
-                        const ownerProjectAccount = ownerProjectAccounts[i];
-                        if (ownerProjectAccount.data.project_owner_pubkey.toString() === ownerProjectData.project_owner_pubkey.toString()
-                            && ownerProjectAccount.data.candy_machine_id.toString() === ownerProjectData.candy_machine_id.toString()
+                    for (let i = ownerProjectAccounts.items.length - 1; i >= 0; i--) {
+                        const ownerProjectAccount = ownerProjectAccounts.items[i];
+
+                        if (ownerProjectAccount.data.project_owner_pubkey.equals(ownerProjectData.project_owner_pubkey)
+                            && ownerProjectAccount.data.candy_machine_id.equals(ownerProjectData.candy_machine_id)
                         ) {
                             isPendingProject = false;
                             break;
@@ -60,7 +63,7 @@ export default function usePendingProjects(): PendingProjectsHookReturnType {
             setPendingProjects(pendingProjects);
             setPendingProjectsLoading(false);
         })();
-    }, [wallet.connected]);
+    }, [wallet.connected, refresh]);
 
     return {
         pendingProjectsLoading,
