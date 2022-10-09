@@ -7,6 +7,8 @@ import {AuthContext} from "../../../src/providers/auth-provider";
 import {PopupMessageContext, PopupMessageTypes} from "../../../src/providers/popup-message-provider";
 import LoadingIcon from "../../../src/components/loading-icon";
 import {WalletAffiliateAccountsContext} from "../../../src/providers/wallet-affiliate-accounts-provider";
+import {sleep} from "@toruslabs/base-controllers";
+import Image from "next/image";
 
 export default function ProjectDetails() {
     const router = useRouter();
@@ -24,6 +26,8 @@ export default function ProjectDetails() {
                 owner: new PublicKey(owner as string),
                 candyMachineId: new PublicKey(candyMachine as string)
             }, wallet, connection);
+
+            await sleep(1000);
 
             refreshWalletHasAffiliateAccounts();
 
@@ -45,17 +49,23 @@ export default function ProjectDetails() {
                         <div className="col-3">
                             <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
                                 {project.projectData?.image_url &&
-                                    <img src={project.projectData?.image_url} className="nft-project__image" alt=""/>}
+                                    <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
+                                }
                             </div>
                         </div>
                         <div className="col ps-md-4">
                             <header className="nft-project__header mb-5">
                                 <h1 className="nft-project__title">
-                                    {project.projectData?.title || `Candy Machine: ${candyMachine}`}
+                                    {project.projectAccount.data.title || `Candy Machine: ${candyMachine}`}
                                 </h1>
                                 <div className="nft-project__description">
                                     {project.projectData?.description}
                                 </div>
+                                <hr/>
+                                <div>Max affiliate count: {project.projectAccount.data.max_affiliate_count}</div>
+                                <div>Affiliate count: {project.projectAccount.data.affiliate_count}</div>
+                                <div>Created at: {project.projectAccount.createdAt()}</div>
+                                <div>Updated at: {project.projectAccount.updatedAt()}</div>
                             </header>
 
                             <div className="mb-5">
@@ -63,7 +73,7 @@ export default function ProjectDetails() {
                                     <h4>Details:</h4>
                                     <ul>
                                         <li>Affiliate fee (%): {project.projectAccount.data.affiliate_fee_percentage}</li>
-                                        <li>Redeem threshold (SOL): {project.projectAccount.data.redeem_threshold_in_sol}</li>
+                                        <li>Affiliate target (SOL): {project.projectAccount.data.affiliate_target_in_sol}</li>
                                     </ul>
                                 </section>
                                 {wallet.connected &&

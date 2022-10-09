@@ -4,7 +4,7 @@ import {AuthContext} from "../providers/auth-provider";
 import AffiliateAccount from "../program/affiliate-accounts/affiliate-account";
 import {PublicKey} from "@solana/web3.js";
 import {PopupMessageContext, PopupMessageTypes} from "../providers/popup-message-provider";
-import {DefaultPaginationOptions, PaginationOptionsType, PaginationType} from "../program/pagination-utils";
+import {DefaultPaginationOptions, PaginationOptionsType, PaginationType} from "../program/utils/pagination";
 
 type AffiliateAccountsHookOptionsType = {
     project?: {

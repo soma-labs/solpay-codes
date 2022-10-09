@@ -9,9 +9,13 @@ import useProject from "../../../../src/hooks/useProject";
 import LoadingIcon from "../../../../src/components/loading-icon";
 import ProjectAffiliates from "../../../../src/components/admin/projects/project-affiliates";
 import getSolscanLink from "../../../../src/utils/solscan-link";
+import {WalletProjectsContext} from "../../../../src/providers/wallet-projects-provider";
+import {sleep} from "@toruslabs/base-controllers";
+import Image from "next/image";
 
 export default function AdminProjectDetails() {
     const {setMessage} = useContext(PopupMessageContext);
+    const {refreshWalletProjects} = useContext(WalletProjectsContext);
     const {wallet, connection} = useContext(AuthContext);
     const router = useRouter();
     const formRef = useRef<HTMLFormElement>(null);
@@ -28,13 +32,19 @@ export default function AdminProjectDetails() {
                 owner: new PublicKey(owner as string),
                 candyMachineId: new PublicKey(candyMachine as string),
                 affiliateFeePercentage: parseFloat(formData.get('affiliate_fee_percentage') as string),
-                redeemThresholdInSol: parseFloat(formData.get('redeem_threshold_in_sol') as string),
+                affiliateTargetInSol: parseFloat(formData.get('affiliate_target_in_sol') as string),
+                maxAffiliateCount: parseInt(formData.get('max_affiliate_count') as string),
+                title: formData.get('title') as string,
             }, wallet, connection);
 
             setMessage(
                 `Update successful! View <a class="link" target="_blank" href="${getSolscanLink(signature)}">transaction</a>`,
                 PopupMessageTypes.Success
             );
+
+            await sleep(1000);
+
+            refreshWalletProjects();
         } catch (e) {
             if (e instanceof Error) {
                 setMessage(e.message, PopupMessageTypes.Error);
@@ -52,14 +62,14 @@ export default function AdminProjectDetails() {
                         <div className="col-12 col-md-3">
                             <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
                                 {project.projectData?.image_url &&
-                                    <img src={project.projectData?.image_url} className="nft-project__image" alt=""/>
+                                    <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
                                 }
                             </div>
                         </div>
                         <div className="col ps-md-4">
                             <header className="nft-project__header mb-5">
                                 <h1 className="nft-project__title">
-                                    {project.projectData?.title || `Candy Machine: ${candyMachine}`}
+                                    {project.projectAccount.data.title}
                                 </h1>
                                 <div className="nft-project__description">
                                     {project.projectData?.description}
@@ -86,11 +96,37 @@ export default function AdminProjectDetails() {
                                         <span className="d-inline-block mb-1">Affiliate target (SOL):</span>
                                         <input
                                             type="number"
-                                            name="redeem_threshold_in_sol"
+                                            name="affiliate_target_in_sol"
                                             step={0.01}
                                             min={0}
                                             className="form-control"
-                                            defaultValue={project.projectAccount.data.redeem_threshold_in_sol}
+                                            defaultValue={project.projectAccount.data.affiliate_target_in_sol}
+                                            required
+                                        />
+                                    </label>
+                                </p>
+                                <p>
+                                    <label className="form-label w-100">
+                                        <span className="d-inline-block mb-1">Max affiliate count</span>
+                                        <input
+                                            type="number"
+                                            name="max_affiliate_count"
+                                            min={1}
+                                            max={255}
+                                            defaultValue={project.projectAccount.data.max_affiliate_count}
+                                            className="form-control w-100"
+                                            required
+                                        />
+                                    </label>
+                                </p>
+                                <p>
+                                    <label className="form-label w-100">
+                                        <span className="d-inline-block mb-1">Title</span>
+                                        <input
+                                            type="text"
+                                            name="title"
+                                            defaultValue={project.projectAccount.data.title}
+                                            className="form-control w-100"
                                             required
                                         />
                                     </label>

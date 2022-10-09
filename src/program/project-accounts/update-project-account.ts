@@ -9,21 +9,34 @@ class ProjectAccountUpdateData {
     project_owner_pubkey: PublicKey;
     candy_machine_id: PublicKey;
     affiliate_fee_percentage: number;
-    redeem_threshold_in_sol: number;
+    affiliate_target_in_sol: number;
+    max_affiliate_count: number;
+    title: string;
 
     borshInstructionSchema = borsh.struct([
         borsh.u8('variant'),
         borsh.publicKey('project_owner_pubkey'),
         borsh.publicKey('candy_machine_id'),
         borsh.f64('affiliate_fee_percentage'),
-        borsh.u8('redeem_threshold_in_sol'),
+        borsh.u8('affiliate_target_in_sol'),
+        borsh.u8('max_affiliate_count'),
+        borsh.str('title'),
     ]);
 
-    constructor(project_owner_pubkey: PublicKey, candy_machine_id: PublicKey, affiliate_fee_percentage: number, redeem_threshold_in_sol: number) {
+    constructor(
+        project_owner_pubkey: PublicKey,
+        candy_machine_id: PublicKey,
+        affiliate_fee_percentage: number,
+        affiliate_target_in_sol: number,
+        max_affiliate_count: number,
+        title: string
+    ) {
         this.project_owner_pubkey = project_owner_pubkey;
         this.candy_machine_id = candy_machine_id;
         this.affiliate_fee_percentage = affiliate_fee_percentage;
-        this.redeem_threshold_in_sol = redeem_threshold_in_sol;
+        this.affiliate_target_in_sol = affiliate_target_in_sol;
+        this.max_affiliate_count = max_affiliate_count;
+        this.title = title;
     }
 
     serialize(): Buffer {
@@ -40,7 +53,9 @@ const updateProjectAccount = async (
         owner: PublicKey,
         candyMachineId: PublicKey,
         affiliateFeePercentage: number,
-        redeemThresholdInSol: number,
+        affiliateTargetInSol: number,
+        maxAffiliateCount: number,
+        title: string,
     },
     wallet: WalletAdapter,
     connection: Connection,
@@ -66,7 +81,9 @@ const updateProjectAccount = async (
         data.owner,
         data.candyMachineId,
         data.affiliateFeePercentage,
-        data.redeemThresholdInSol
+        data.affiliateTargetInSol,
+        data.maxAffiliateCount,
+        data.title
     );
     const transaction = new Transaction();
     const updateInstruction = new TransactionInstruction({

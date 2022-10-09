@@ -8,6 +8,7 @@ import useAffiliateAccounts from "../src/hooks/useAffiliateAccounts";
 import {PopupMessageContext, PopupMessageTypes} from "../src/providers/popup-message-provider";
 import SimplePagination from "../src/components/simple-pagination";
 import useQueryParamsPagination from "../src/hooks/useQueryParamsPagination";
+import Image from "next/image";
 
 export default function MyEarnings() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -72,6 +73,7 @@ export default function MyEarnings() {
                                         <th>#</th>
                                         <th>Image</th>
                                         <th>Title</th>
+                                        <th>Mints</th>
                                         <th>Progress</th>
                                         <td>Actions</td>
                                     </tr>
@@ -84,16 +86,19 @@ export default function MyEarnings() {
                                                 <td>
                                                     <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
                                                         <a>
-                                                            <img src={affiliateAccount.project?.projectData?.image_url} className="projects-table__image" alt=""/>
+                                                            <Image src={affiliateAccount.project?.projectData?.image_url as string} className="projects-table__image" alt="NFT project image" width="50" height="50"/>
                                                         </a>
                                                     </Link>
                                                 </td>
                                                 <td>
                                                     <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
                                                         <a className="link">
-                                                            {affiliateAccount.project?.projectData?.title ?? affiliateAccount.data.candy_machine_id.toString()}
+                                                            {affiliateAccount.project?.projectAccount.data.title ?? affiliateAccount.data.candy_machine_id.toString()}
                                                         </a>
                                                     </Link>
+                                                </td>
+                                                <td>
+                                                    {affiliateAccount.data.mint_count}
                                                 </td>
                                                 <td>
                                                     {affiliateAccount.targetProgress()}%

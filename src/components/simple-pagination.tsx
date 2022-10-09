@@ -1,4 +1,4 @@
-import {PaginationType} from "../program/pagination-utils";
+import {PaginationType} from "../program/utils/pagination";
 import Link from "next/link";
 
 export default function SimplePagination({pagination, classVariation}: {pagination: PaginationType, classVariation?: string}) {

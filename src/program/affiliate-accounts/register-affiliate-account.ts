@@ -4,6 +4,7 @@ import * as borsh from "@project-serum/borsh";
 import {Buffer} from "buffer";
 import {AffiliateAccountDiscriminator} from "./affiliate-account";
 import {CmaProgramInstructions, CmaProgramId, SolPayTreasuryAccount} from "../constants";
+import getProjectAccountAddress from "../project-accounts/get-project-account-address";
 
 class AffiliateAccountRegistrationData {
     project_owner_pubkey: PublicKey;
@@ -45,6 +46,12 @@ const registerAffiliateAccount = async (
         throw 'Wallet not connected';
     }
 
+    const projectAccountAddress = await getProjectAccountAddress(data.owner, data.candyMachineId, connection);
+
+    if (!projectAccountAddress) {
+        throw 'Project not found';
+    }
+
     const [pda] = await PublicKey.findProgramAddress(
         [
             new Buffer(AffiliateAccountDiscriminator),
@@ -67,6 +74,11 @@ const registerAffiliateAccount = async (
             },
             {
                 pubkey: pda,
+                isSigner: false,
+                isWritable: true,
+            },
+            {
+                pubkey: projectAccountAddress,
                 isSigner: false,
                 isWritable: true,
             },

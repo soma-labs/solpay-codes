@@ -5,7 +5,9 @@ import {getBatchProjectData} from "../models/project/get-project-data";
 import getProjects from "../models/project/get-projects";
 import {AuthContext} from "../providers/auth-provider";
 import {PopupMessageContext, PopupMessageTypes} from "../providers/popup-message-provider";
-import {DefaultPaginationOptions, PaginationOptionsType, PaginationType} from "../program/pagination-utils";
+import {DefaultPaginationOptions, PaginationOptionsType, PaginationType} from "../program/utils/pagination";
+import {OrderOptionsType} from "../program/utils/ordering";
+import {DefaultProjectOrderOptions} from "../program/project-accounts/ordering-helpers";
 
 type ProjectsHookReturnType = {
     projects: Project[];
@@ -13,10 +15,13 @@ type ProjectsHookReturnType = {
     pagination: PaginationType,
 };
 
+//TODO: Consider refactoring hook parameters
 export default function useProjects(
     forCurrentWallet: boolean = false,
     refresh: number = 0,
-    paginationOptions: PaginationOptionsType = DefaultPaginationOptions
+    paginationOptions: PaginationOptionsType = DefaultPaginationOptions,
+    orderOptions: OrderOptionsType = DefaultProjectOrderOptions,
+    title?: string,
 ): ProjectsHookReturnType {
     const {setMessage} = useContext(PopupMessageContext);
     const {wallet, connection} = useContext(AuthContext);
@@ -40,16 +45,15 @@ export default function useProjects(
                 projectAccountsOptions.owner = wallet.publicKey;
             }
 
-            if (paginationOptions.page) {
-                projectAccountsOptions.page = paginationOptions.page;
-            }
-
-            if (paginationOptions.perPage) {
-                projectAccountsOptions.perPage = paginationOptions.perPage;
+            if (title) {
+                projectAccountsOptions.title = title;
             }
 
             try {
-                const projectAccounts = await getProjectAccounts(connection, projectAccountsOptions);
+                const projectAccounts = await getProjectAccounts(
+                    connection,
+                    Object.assign({}, projectAccountsOptions, paginationOptions, orderOptions)
+                );
 
                 if (!projectAccounts.items.length) {
                     setProjects([]);
@@ -80,7 +84,15 @@ export default function useProjects(
                 setProjectsLoading(false);
             }
         })();
-    }, [wallet.connected, refresh, paginationOptions.page, paginationOptions.perPage]);
+    }, [
+        wallet.connected,
+        refresh,
+        paginationOptions.page,
+        paginationOptions.perPage,
+        orderOptions.orderDir,
+        orderOptions.orderBy,
+        title
+    ]);
 
     return {
         projects,

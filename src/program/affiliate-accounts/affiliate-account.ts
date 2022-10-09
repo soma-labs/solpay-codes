@@ -4,9 +4,10 @@ import {AccountInfo, Connection, LAMPORTS_PER_SOL, PublicKey} from "@solana/web3
 import getProjectAccount from "../project-accounts/get-project-account";
 import Project from '../../models/project/project';
 import getProjectData from "../../models/project/get-project-data";
+import BN from "bn.js";
 
 export const AffiliateAccountDiscriminator = 'affiliate_account';
-const AffiliateAccountRentInSol = 0.00171912;
+const AffiliateAccountRentInSol = 0.00180264;
 
 export type AffiliateAccountPropsType = {
     discriminator: string;
@@ -20,6 +21,8 @@ export type AffiliateAccountDataType = {
     affiliate_pubkey: PublicKey,
     project_owner_pubkey: PublicKey,
     candy_machine_id: PublicKey,
+    mint_count: number,
+    created_at: BN
 }
 
 export default class AffiliateAccount {
@@ -38,6 +41,8 @@ export default class AffiliateAccount {
             borsh.publicKey('affiliate_pubkey'),
             borsh.publicKey('project_owner_pubkey'),
             borsh.publicKey('candy_machine_id'),
+            borsh.u32('mint_count'),
+            borsh.i64('created_at'),
         ], 'data')
     ]);
 
@@ -86,7 +91,7 @@ export default class AffiliateAccount {
             return false;
         }
 
-        return (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) >= this.project.projectAccount.data.redeem_threshold_in_sol;
+        return (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) >= this.project.projectAccount.data.affiliate_target_in_sol;
     }
 
     targetProgress(): string {
@@ -94,7 +99,11 @@ export default class AffiliateAccount {
             return '0';
         }
 
-        return (100 * (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) / this.project.projectAccount.data.redeem_threshold_in_sol).toFixed(2);
+        return (100 * (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) / this.project.projectAccount.data.affiliate_target_in_sol).toFixed(2);
+    }
+
+    createdAt(): string {
+        return (new Date(this.data.created_at.muln(1000).toNumber())).toISOString();
     }
 
     static deserialize(account: AccountInfo<Buffer>): AffiliateAccount | null {

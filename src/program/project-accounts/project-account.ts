@@ -1,8 +1,10 @@
 import * as borsh from '@project-serum/borsh';
 import {Buffer} from "buffer";
 import {PublicKey} from "@solana/web3.js";
+import BN from "bn.js";
 
 export const ProjectAccountDiscriminator = 'project_account';
+export const ProjectTitleMaxLength = 50;
 
 export type ProjectAccountPropsType = {
     discriminator: string;
@@ -15,7 +17,12 @@ export type ProjectAccountDataType = {
     project_owner_pubkey: PublicKey,
     candy_machine_id: PublicKey,
     affiliate_fee_percentage: number,
-    redeem_threshold_in_sol: number,
+    affiliate_target_in_sol: number,
+    max_affiliate_count: number,
+    affiliate_count: number,
+    title: string,
+    created_at: BN,
+    updated_at: BN,
 }
 
 export default class ProjectAccount {
@@ -32,7 +39,12 @@ export default class ProjectAccount {
             borsh.publicKey('project_owner_pubkey'),
             borsh.publicKey('candy_machine_id'),
             borsh.f64('affiliate_fee_percentage'),
-            borsh.u8('redeem_threshold_in_sol'),
+            borsh.u8('affiliate_target_in_sol'),
+            borsh.u8('max_affiliate_count'),
+            borsh.u8('affiliate_count'),
+            borsh.str('title'),
+            borsh.i64('created_at'),
+            borsh.i64('updated_at'),
         ], 'data')
     ]);
 
@@ -57,5 +69,13 @@ export default class ProjectAccount {
 
             return null;
         }
+    }
+
+    createdAt(): string {
+        return (new Date(this.data.created_at.muln(1000).toNumber())).toISOString();
+    }
+
+    updatedAt(): string {
+        return (new Date(this.data.updated_at.muln(1000).toNumber())).toISOString();
     }
 }

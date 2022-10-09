@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type ProjectCardPropsType = {
     title?: string,
     description?: string,
@@ -11,7 +13,7 @@ export default function ProjectCard(props: ProjectCardPropsType) {
             <header className="nft-project__header mb-3">
                 {props.imageUrl &&
                     <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
-                        <img src={props.imageUrl} className="nft-project__image" alt=""/>
+                        <Image src={props.imageUrl} className="nft-project__image" alt="NFT project image" layout="fill"/>
                     </div>
                 }
                 {props.title &&

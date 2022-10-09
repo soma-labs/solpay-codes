@@ -55,6 +55,8 @@ export default function ProjectAffiliates({owner, candyMachine}: {
                                 <th>#</th>
                                 <th>Affiliate wallet</th>
                                 <th>Target progress (%)</th>
+                                <th>Mint count</th>
+                                <th>Created at</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -65,6 +67,8 @@ export default function ProjectAffiliates({owner, candyMachine}: {
                                         <td>{index + 1}</td>
                                         <td><span className="pubkey">{affiliateAccount.data.affiliate_pubkey.toString()}</span></td>
                                         <td>{affiliateAccount.targetProgress()}%</td>
+                                        <td>{affiliateAccount.data.mint_count}</td>
+                                        <td>{affiliateAccount.createdAt()}</td>
                                         <td>
                                             <button
                                                 className="button button--hollow button--danger"

@@ -54,6 +54,7 @@
     }
 
     .nft-project__image-container {
+        position: relative;
         height: 20rem;
         overflow: hidden;
     }
@@ -79,6 +80,7 @@
 
 .nft-project--single {
     .nft-project__image-container {
+        position: relative;
         height: 25rem;
         overflow: hidden;
     }
@@ -92,6 +94,7 @@
 
 .nft-project--mint {
     .nft-project__image-container {
+        position: relative;
         max-width: 100%;
         width: 512px;
         height: 512px;

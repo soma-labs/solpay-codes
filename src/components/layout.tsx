@@ -5,6 +5,7 @@ import Link from "next/link";
 import {WalletPendingProjectsContext} from "../providers/wallet-pending-projects-provider";
 import {WalletProjectsContext} from "../providers/wallet-projects-provider";
 import {WalletAffiliateAccountsContext} from "../providers/wallet-affiliate-accounts-provider";
+import Image from "next/image";
 
 export default function Layout({ children }: { children: any }) {
     const {
@@ -40,7 +41,7 @@ export default function Layout({ children }: { children: any }) {
                     <div className="cma-main__sidebar__logo mb-5">
                         <Link href="/">
                             <a>
-                                <img src="/images/solpay-codes-logo.jpg" alt="" className="cma-logo"/>
+                                <Image src={`/images/solpay-codes-logo.jpg`} alt="solpay.codes logo" width={183.6} height={183.6}/>
                             </a>
                         </Link>
                     </div>
@@ -91,7 +92,7 @@ export default function Layout({ children }: { children: any }) {
                                     (project, index) =>
                                         <li key={index} className="cma-menu__item">
                                             <Link href={`/my-projects/${project.projectAccount.data.candy_machine_id.toString()}`}>
-                                                <a>{project.projectData?.title || project.projectAccount.data.candy_machine_id.toString()}</a>
+                                                <a>{project.projectAccount.data.title || project.projectAccount.data.candy_machine_id.toString()}</a>
                                             </Link>
                                         </li>
                                 )}

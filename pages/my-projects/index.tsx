@@ -20,7 +20,7 @@ export default function MyProjects() {
                             projects.map((project, index) =>
                                 <div key={index} className="nft-project-item col-12 col-md-3">
                                     <ProjectCard
-                                        title={project.projectData?.title || project.projectAccount.data.candy_machine_id.toString()}
+                                        title={project.projectAccount.data.title || project.projectAccount.data.candy_machine_id.toString()}
                                         description={project.projectData?.description}
                                         imageUrl={project.projectData?.image_url}
                                         actions={[

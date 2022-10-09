@@ -110,11 +110,12 @@ export default function ProjectMint() {
                     <div className="col-12 col-md-4">
                         <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
                             {project.projectData?.image_url &&
-                                <img src={project.projectData?.image_url} className="nft-project__image" alt=""/>}
+                                <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
+                            }
                         </div>
                         <header className="nft-project__header mb-5">
                             <h1 className="nft-project__title">
-                                {project.projectData?.title || `Candy Machine: ${candyMachine}`}
+                                {project.projectAccount.data.title || `Candy Machine: ${candyMachine}`}
                             </h1>
                             <div className="nft-project__description">
                                 {project.projectData?.description}

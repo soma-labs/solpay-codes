@@ -1,4 +1,5 @@
 import Project from "../../../models/project/project";
+import Image from "next/image";
 
 export default function ProjectsTable({projects, actions}: {projects: Project[], actions: any}) {
     return (
@@ -8,6 +9,10 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                     <th>#</th>
                     <th>Image</th>
                     <th>Title</th>
+                    <th>Max affiliate count</th>
+                    <th>Affiliate count</th>
+                    <th>Created at</th>
+                    <th>Updated at</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -19,11 +24,22 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                                 {index + 1}
                             </td>
                             <td>
-                                <img src={project.projectData?.image_url} className="projects-table__image" alt=""/>
+                                <Image src={project.projectData?.image_url as string} className="projects-table__image" alt="NFT project image" width="50" height="50"/>
                             </td>
                             <td>
-
-                                {project.projectData?.title ?? project.projectAccount.data.candy_machine_id.toString()}
+                                {project.projectAccount.data.title ?? project.projectAccount.data.candy_machine_id.toString()}
+                            </td>
+                            <td>
+                                {project.projectAccount.data.max_affiliate_count}
+                            </td>
+                            <td>
+                                {project.projectAccount.data.affiliate_count}
+                            </td>
+                            <td>
+                                {project.projectAccount.createdAt()}
+                            </td>
+                            <td>
+                                {project.projectAccount.updatedAt()}
                             </td>
                             <td>
                                 {actions(project)}

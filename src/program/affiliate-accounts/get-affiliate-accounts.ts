@@ -2,7 +2,7 @@ import {Connection, PublicKey} from "@solana/web3.js";
 import AffiliateAccount, {AffiliateAccountDiscriminator} from "./affiliate-account";
 import {CmaProgramId} from "../constants";
 import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes";
-import {getPaginatedAccounts, PaginationOptionsType, PaginationType} from "../pagination-utils";
+import {getPaginatedAccounts, PaginationOptionsType, PaginationType} from "../utils/pagination";
 
 export type GetAffiliateAccountsOptionsType = {
     affiliate?: PublicKey,
@@ -63,6 +63,8 @@ const getAffiliateAccounts = async (
             }
         });
     }
+
+    //TODO: Implement ordering
 
     const accountsWithoutData = await connection.getProgramAccounts(
         new PublicKey(CmaProgramId),

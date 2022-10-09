@@ -9,6 +9,7 @@ export enum CmaProgramInstructions {
     RegisterAffiliateAccount = 3,
     RedeemReward = 4,
     CloseAffiliateAccount = 5,
+    IncrementAffiliateAccountMintCount = 6,
 }
 
 export const SolPayTreasuryAccount = new PublicKey(process.env.NEXT_PUBLIC_SOLPAY_TREASURY as string);

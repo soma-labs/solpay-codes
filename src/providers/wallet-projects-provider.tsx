@@ -13,6 +13,7 @@ export const WalletProjectsContext = React.createContext<WalletProjectsContextTy
 export default function WalletProjectsProvider({children}: {children: any}) {
     const [refreshWalletProjects, setRefreshWalletProjects] = useState<number>(Date.now());
     const walletProjects = useProjects(true, refreshWalletProjects, {
+        // TODO: Implement pagination when list becomes too long
         perPage: -1
     });
 

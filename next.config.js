@@ -9,10 +9,11 @@ const nextConfig = {
     },
     experimental: {
         images: {
+            // TODO: Apply remote patterns for production
             remotePatterns: [
                 {
                     protocol: 'https',
-                    hostname: 'cdnwp-s3.benzinga.com',
+                    hostname: '*',
                 },
             ],
         },

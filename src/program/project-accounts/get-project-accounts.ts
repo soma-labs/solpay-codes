@@ -1,12 +1,16 @@
 import {Connection, PublicKey} from "@solana/web3.js";
 import {CmaProgramId} from "../constants";
-import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes";
+import {bs58} from "@project-serum/anchor/dist/cjs/utils/bytes";
 import ProjectAccount, {ProjectAccountDiscriminator} from "./project-account";
-import {getPaginatedAccounts, PaginationOptionsType, PaginationType} from "../pagination-utils";
+import {getPaginatedAccounts, PaginationOptionsType, PaginationType} from "../utils/pagination";
+import {Buffer} from "buffer";
+import {OrderOptionsType,} from "../utils/ordering";
+import {DefaultProjectOrderOptions, ProjectTitleDataSlice} from "./ordering-helpers";
 
 export type GetProjectAccountsOptionsType = {
     owner?: PublicKey,
-} & PaginationOptionsType;
+    title?: string,
+} & PaginationOptionsType & OrderOptionsType;
 
 export type GetProjectAccountsReturnType = {
     items: ProjectAccount[],
@@ -37,18 +41,40 @@ const getProjectAccounts = async (
         });
     }
 
-    const accountsWithoutData = await connection.getProgramAccounts(
+    //TODO: Consider searching in memory on the client side to avoid having to write the exact title
+    if (options?.title) {
+        filters.push({
+            memcmp: {
+                offset: ProjectTitleDataSlice.offset + 4,
+                bytes: bs58.encode(Buffer.from(options.title))
+            }
+        });
+    }
+
+    let {dataSlice, getSliceFromAccountData, orderMethod} = DefaultProjectOrderOptions.orderBy!;
+    let orderDir = DefaultProjectOrderOptions.orderDir!;
+
+    if (options?.orderBy) {
+        dataSlice = options.orderBy.dataSlice;
+        getSliceFromAccountData = options.orderBy.getSliceFromAccountData;
+        orderMethod = options.orderBy.orderMethod;
+    }
+
+    if (options?.orderDir) {
+        orderDir = options.orderDir;
+    }
+
+    const accountsWithOrderingData = await connection.getProgramAccounts(
         new PublicKey(CmaProgramId),
         {
-            dataSlice: {
-                offset: 0,
-                length: 0,
-            },
+            dataSlice: dataSlice,
             filters: filters
         }
     );
 
-    const accountKeys = accountsWithoutData.map(account => account.pubkey);
+    orderMethod(accountsWithOrderingData, getSliceFromAccountData, orderDir);
+
+    const accountKeys = accountsWithOrderingData.map(account => account.pubkey);
     const paginatedAccounts = await getPaginatedAccounts(
         connection,
         accountKeys,

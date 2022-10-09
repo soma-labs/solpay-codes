@@ -34,7 +34,7 @@ const candyMachineDetailsHandler = async (req: NextApiRequest, res: NextApiRespo
     const project = new Project(projectAccount, projectData);
 
     res.status(200).json({
-        label: project.projectData?.title ?? project.projectAccount.data.candy_machine_id.toString(),
+        label: project.projectAccount.data.title ?? project.projectAccount.data.candy_machine_id.toString(),
         icon: project.projectData?.image_url ?? `https://${req.headers.host}/images/solpay-codes-logo-white.svg`,
     });
 };
