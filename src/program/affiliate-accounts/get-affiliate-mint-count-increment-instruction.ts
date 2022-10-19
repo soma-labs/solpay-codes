@@ -5,22 +5,22 @@ import {AffiliateAccountDiscriminator} from "./affiliate-account";
 import {CmaProgramInstructions, CmaProgramId} from "../constants";
 
 class AffiliateAccountMintCountIncrementData {
-    affiliate_pubkey: PublicKey;
-    project_owner_pubkey: PublicKey;
-    candy_machine_id: PublicKey;
-
+    // affiliate_pubkey: PublicKey;
+    // project_owner_pubkey: PublicKey;
+    // candy_machine_id: PublicKey;
+    //
     borshInstructionSchema = borsh.struct([
         borsh.u8('variant'),
-        borsh.publicKey('affiliate_pubkey'),
-        borsh.publicKey('project_owner_pubkey'),
-        borsh.publicKey('candy_machine_id'),
+        // borsh.publicKey('affiliate_pubkey'),
+        // borsh.publicKey('project_owner_pubkey'),
+        // borsh.publicKey('candy_machine_id'),
     ]);
 
-    constructor(affiliate_pubkey: PublicKey, project_owner_pubkey: PublicKey, candy_machine_id: PublicKey) {
-        this.affiliate_pubkey = affiliate_pubkey;
-        this.project_owner_pubkey = project_owner_pubkey;
-        this.candy_machine_id = candy_machine_id;
-    }
+    // constructor(affiliate_pubkey: PublicKey, project_owner_pubkey: PublicKey, candy_machine_id: PublicKey) {
+    //     this.affiliate_pubkey = affiliate_pubkey;
+    //     this.project_owner_pubkey = project_owner_pubkey;
+    //     this.candy_machine_id = candy_machine_id;
+    // }
 
     serialize(): Buffer {
         const buffer = Buffer.alloc(1000);
@@ -49,7 +49,7 @@ const getAffiliateMintCountIncrementInstruction = async (
         CmaProgramId
     );
 
-    const mintCountIncrementData = new AffiliateAccountMintCountIncrementData(data.affiliate, data.owner, data.candyMachineId);
+    const mintCountIncrementData = new AffiliateAccountMintCountIncrementData(); // data.affiliate, data.owner, data.candyMachineId
     return new TransactionInstruction({
         programId: CmaProgramId,
         keys: [

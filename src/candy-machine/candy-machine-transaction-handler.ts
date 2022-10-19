@@ -124,13 +124,15 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
         }
     }
 
-    const solpayFeeInstruction = SystemProgram.transfer({
-        fromPubkey: walletPublicKey,
-        toPubkey: new PublicKey(SOLPAY_TREASURY),
-        lamports: solpayFee,
-    });
+    if (solpayFee !== 0) {
+        const solpayFeeInstruction = SystemProgram.transfer({
+            fromPubkey: walletPublicKey,
+            toPubkey: new PublicKey(SOLPAY_TREASURY),
+            lamports: solpayFee,
+        });
 
-    instructions.unshift(solpayFeeInstruction);
+        instructions.unshift(solpayFeeInstruction);
+    }
 
     const transaction = new Transaction({feePayer: walletPublicKey});
 

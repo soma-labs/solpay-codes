@@ -23,7 +23,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const recaptchaVerificationJsonResponse = await recaptchaVerificationResponse.json();
 
     if (!recaptchaVerificationJsonResponse.success) {
-        res.status(400).end();
+        res.status(400).json({
+            errors: {
+                recaptcha: "ReCaptcha verification failed"
+            }
+        });
 
         return;
     }
@@ -52,7 +56,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return;
         }
 
-        res.status(400).end();
+        res.status(400).json({
+            errors: {
+                error: "Request failed"
+            }
+        });
 
         return;
     }
