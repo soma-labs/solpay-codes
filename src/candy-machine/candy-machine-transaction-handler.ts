@@ -8,8 +8,6 @@ import * as anchor from '@project-serum/anchor';
 import {getCandyMachineAccount, mintOneToken} from "./candy-machine";
 import getAffiliateAccountAddress from "../program/affiliate-accounts/get-affiliate-account-address";
 import {createMintToCheckedInstruction, getAssociatedTokenAddress} from "@solana/spl-token";
-import getAffiliateMintCountIncrementInstruction
-    from "../program/affiliate-accounts/get-affiliate-mint-count-increment-instruction";
 
 const SOLPAY_TREASURY = process.env.NEXT_PUBLIC_SOLPAY_TREASURY as string;
 const SOLPAY_FEE_NORMAL_MINT_PERCENTAGE = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_NORMAL_MINT_PERCENTAGE as string);
@@ -101,7 +99,6 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
             );
 
             instructions.unshift(whitelistTokenTransferInstruction);
-            signers = [WHITELIST_AUTHORITY_KEYPAIR, ...signers];
 
             const affiliateWalletFeeInstruction = SystemProgram.transfer({
                 fromPubkey: walletPublicKey,
@@ -111,16 +108,7 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
 
             instructions.unshift(affiliateWalletFeeInstruction);
 
-            const affiliateMintCountIncrementInstruction = await getAffiliateMintCountIncrementInstruction(
-                {
-                    signerPubkey: WHITELIST_AUTHORITY_KEYPAIR.publicKey,
-                    affiliate: affiliatePubkey,
-                    owner: ownerPubkey,
-                    candyMachineId: candyMachinePubkey
-                }
-            );
-
-            instructions.unshift(affiliateMintCountIncrementInstruction);
+            signers = [WHITELIST_AUTHORITY_KEYPAIR, ...signers];
         }
     }
 

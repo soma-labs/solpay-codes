@@ -4,6 +4,7 @@ import {PopupMessageContext, PopupMessageTypes} from "../../../providers/popup-m
 import {AuthContext} from "../../../providers/auth-provider";
 import closeAffiliateAccount from "../../../program/affiliate-accounts/close-affiliate-account";
 import useAffiliateAccounts from "../../../hooks/useAffiliateAccounts";
+import AffiliateAccountsTable from "../../affiliates/affiliate-accounts-table";
 
 export default function ProjectAffiliates({owner, candyMachine}: {
     owner: string,
@@ -44,44 +45,21 @@ export default function ProjectAffiliates({owner, candyMachine}: {
         }
     };
 
+    const closeAffiliateAccountButton = (affiliateAccount: AffiliateAccount) =>
+        <button
+            className="button button--hollow button--danger"
+            onClick={onCloseAffiliateAccountAction.bind(null, affiliateAccount)}
+        >
+            Close affiliate account
+        </button>;
+
     return (
         <>
             {affiliateAccounts.length > 0 ?
                 <section className="nft-project__affiliates">
                     <h4>Nb of affiliates: {affiliateAccounts.length}</h4>
-                    <table className="table table-dark table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Affiliate wallet</th>
-                                <th>Target progress (%)</th>
-                                <th>Mint count</th>
-                                <th>Created at</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                affiliateAccounts.map((affiliateAccount, index) =>
-                                    <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        <td><span className="pubkey">{affiliateAccount.data.affiliate_pubkey.toString()}</span></td>
-                                        <td>{affiliateAccount.targetProgress()}%</td>
-                                        <td>{affiliateAccount.data.mint_count}</td>
-                                        <td>{affiliateAccount.createdAt()}</td>
-                                        <td>
-                                            <button
-                                                className="button button--hollow button--danger"
-                                                onClick={onCloseAffiliateAccountAction.bind(null, affiliateAccount)}
-                                            >
-                                                Close affiliate account
-                                            </button>
-                                        </td>
-                                    </tr>
-                                )
-                            }
-                        </tbody>
-                    </table>
+
+                    <AffiliateAccountsTable affiliateAccounts={affiliateAccounts} actions={[closeAffiliateAccountButton]}/>
                 </section>
                 : null
             }

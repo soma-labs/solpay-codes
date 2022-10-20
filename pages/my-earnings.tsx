@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext, useState} from "react";
 import {AuthContext} from "../src/providers/auth-provider";
 import Link from "next/link";
 import AffiliateAccount from "../src/program/affiliate-accounts/affiliate-account";
@@ -8,7 +8,7 @@ import useAffiliateAccounts from "../src/hooks/useAffiliateAccounts";
 import {PopupMessageContext, PopupMessageTypes} from "../src/providers/popup-message-provider";
 import SimplePagination from "../src/components/simple-pagination";
 import useQueryParamsPagination from "../src/hooks/useQueryParamsPagination";
-import Image from "next/image";
+import AffiliateAccountsTable from "../src/components/affiliates/affiliate-accounts-table";
 
 export default function MyEarnings() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -67,49 +67,7 @@ export default function MyEarnings() {
                         </h4>
                         :
                         <>
-                            <table className="projects-table table table-dark table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Image</th>
-                                        <th>Title</th>
-                                        <th>Mints</th>
-                                        <th>Progress</th>
-                                        <td>Actions</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        affiliateAccounts.map((affiliateAccount, index) =>
-                                            <tr key={index}>
-                                                <td>{index + 1}</td>
-                                                <td>
-                                                    <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
-                                                        <a>
-                                                            <Image src={affiliateAccount.project?.projectData?.image_url as string} className="projects-table__image" alt="NFT project image" width="50" height="50"/>
-                                                        </a>
-                                                    </Link>
-                                                </td>
-                                                <td>
-                                                    <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
-                                                        <a className="link">
-                                                            {affiliateAccount.project?.projectAccount.data.title ?? affiliateAccount.data.candy_machine_id.toString()}
-                                                        </a>
-                                                    </Link>
-                                                </td>
-                                                <td>
-                                                    {affiliateAccount.data.mint_count}
-                                                </td>
-                                                <td>
-                                                    {affiliateAccount.targetProgress()}%
-                                                </td>
-                                                <td>
-                                                    {claimRewardButton(affiliateAccount)}
-                                                </td>
-                                            </tr>)
-                                    }
-                                </tbody>
-                            </table>
+                            <AffiliateAccountsTable affiliateAccounts={affiliateAccounts} actions={[claimRewardButton]}/>
                             <SimplePagination pagination={pagination} classVariation={`earnings-list`}/>
                         </>
             }

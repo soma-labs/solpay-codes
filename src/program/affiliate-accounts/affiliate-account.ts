@@ -21,7 +21,7 @@ export type AffiliateAccountDataType = {
     affiliate_pubkey: PublicKey,
     project_owner_pubkey: PublicKey,
     candy_machine_id: PublicKey,
-    mint_count: number,
+    total_redeemed_amount_in_sol: number,
     created_at: BN
 }
 
@@ -41,7 +41,7 @@ export default class AffiliateAccount {
             borsh.publicKey('affiliate_pubkey'),
             borsh.publicKey('project_owner_pubkey'),
             borsh.publicKey('candy_machine_id'),
-            borsh.u32('mint_count'),
+            borsh.u32('total_redeemed_amount_in_sol'),
             borsh.i64('created_at'),
         ], 'data')
     ]);
@@ -100,6 +100,17 @@ export default class AffiliateAccount {
         }
 
         return (100 * (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) / this.project.projectAccount.data.affiliate_target_in_sol).toFixed(2);
+    }
+
+    mintCount(whiteListNftPrice: BN | null): number {
+        if (!this.project || !whiteListNftPrice) {
+            return 0;
+        }
+
+        const nftPriceInSol = whiteListNftPrice.toNumber() / LAMPORTS_PER_SOL;
+        const historicBalance = this.lamports / LAMPORTS_PER_SOL + this.data.total_redeemed_amount_in_sol - AffiliateAccountRentInSol;
+
+        return historicBalance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100);
     }
 
     createdAt(): string {
