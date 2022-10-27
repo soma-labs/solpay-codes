@@ -118,7 +118,8 @@ export default class AffiliateAccount {
         const nftPriceInSol = whiteListNftPrice.toNumber() / LAMPORTS_PER_SOL;
         const historicBalance = this.lamports / LAMPORTS_PER_SOL + this.data.total_redeemed_amount_in_sol - AffiliateAccountRentInSol;
 
-        return historicBalance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100);
+        /* Floating point arithmetic FTW */
+        return Math.ceil(historicBalance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100));
     }
 
     createdAt(): string {
