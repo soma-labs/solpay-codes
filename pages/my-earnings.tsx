@@ -112,7 +112,7 @@ export default function MyEarnings() {
             <Link href={affiliateLink}>
                 <a onClick={copyLinkToClipboard}>
                     <Button startIcon={<ContentCopyIcon/>} size="small">
-                        {linkCopied ?  `Link copied` : `Copy Affiliate Link`}
+                        {linkCopied ?  `Copied` : `Copy Affiliate Link`}
                     </Button>
                 </a>
             </Link>
