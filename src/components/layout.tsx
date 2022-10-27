@@ -92,7 +92,7 @@ export default function Layout({ children }: { children: any }) {
                                     (project, index) =>
                                         <li key={index} className="cma-menu__item">
                                             <Link href={`/my-projects/${project.projectAccount.data.candy_machine_id.toString()}`}>
-                                                <a>{project.projectAccount.data.title || project.projectAccount.data.candy_machine_id.toString()}</a>
+                                                <a>{project.getTitle()}</a>
                                             </Link>
                                         </li>
                                 )}

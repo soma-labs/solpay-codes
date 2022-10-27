@@ -42,7 +42,7 @@ export default function MyProjectDetails() {
                                     Details
                                 </Typography>
 
-                                <List dense disablePadding className="bullet-list">
+                                <List dense disablePadding>
                                     <ListItem disableGutters>
                                         <strong>Created at:</strong>&nbsp;{project.projectAccount.createdAt()}
                                     </ListItem>

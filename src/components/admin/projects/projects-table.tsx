@@ -15,7 +15,7 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                         <TableCell>Affiliate count</TableCell>
                         <TableCell>Created at</TableCell>
                         <TableCell>Updated at</TableCell>
-                        <TableCell>Actions</TableCell>
+                        <TableCell align="right">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -23,7 +23,7 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                         projects.map((project, index) =>
                             <TableRow key={index}>
                                 <TableCell>
-                                    <Link href={`/projects/${project.projectAccount.data.project_owner_pubkey.toString()}/${project.projectAccount.data.candy_machine_id.toString()}`}>
+                                    <Link href={project.getTitle()}>
                                         <a>
                                             <Box sx={{width: 50, height: 50, position: 'relative'}}>
                                                 <Image src={project.projectData?.image_url as string} className="projects-table__image" alt="NFT project image" width="50" height="50"/>
@@ -32,7 +32,7 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                                     </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <Link href={`/projects/${project.projectAccount.data.project_owner_pubkey.toString()}/${project.projectAccount.data.candy_machine_id.toString()}`}>
+                                    <Link href={project.getTitle()}>
                                         <a>
                                             <Typography>
                                                 <MuiLink component="span">
@@ -62,7 +62,7 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                                         {project.projectAccount.updatedAt()}
                                     </Typography>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell align="right">
                                     {actions(project)}
                                 </TableCell>
                             </TableRow>

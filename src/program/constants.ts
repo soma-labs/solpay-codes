@@ -12,4 +12,6 @@ export enum CmaProgramInstructions {
     IncrementAffiliateAccountMintCount = 6,
 }
 
+export const SolTokenIcon = '◎';
+
 export const SolPayTreasuryAccount = new PublicKey(process.env.NEXT_PUBLIC_SOLPAY_TREASURY as string);

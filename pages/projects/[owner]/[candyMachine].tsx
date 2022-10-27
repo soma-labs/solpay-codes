@@ -9,8 +9,10 @@ import LoadingIcon from "../../../src/components/loading-icon";
 import {WalletAffiliateAccountsContext} from "../../../src/providers/wallet-affiliate-accounts-provider";
 import {sleep} from "@toruslabs/base-controllers";
 import Image from "next/image";
-import {Box, Container, Grid, List, ListItem, Typography} from "@mui/material";
+import {Box, Button, Card, Container, Grid, List, ListItem, Typography} from "@mui/material";
 import {LoadingButton} from "@mui/lab";
+import {SolTokenIcon} from "../../../src/program/constants";
+import Link from "next/link";
 
 export default function ProjectDetails() {
     const router = useRouter();
@@ -57,8 +59,8 @@ export default function ProjectDetails() {
     return (
         <Container maxWidth="xl" sx={{p: 3}} className="nft-project nft-project--single">
             {projectLoading ? <LoadingIcon/> : !project ? null :
-                <Grid container spacing={2}>
-                    <Grid item xs={12} md={3}>
+                <Grid container display="flex" justifyContent="center" spacing={3}>
+                    <Grid item xs={12} md={4} display="flex" flexDirection="column" alignItems="center">
                         <Box className="nft-project__image-container">
                             {project.projectData?.image_url &&
                                 <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
@@ -66,7 +68,7 @@ export default function ProjectDetails() {
                         </Box>
                     </Grid>
 
-                    <Grid item xs>
+                    <Grid item xs={12} md={4}>
                         <Box component="header" className="nft-project__header" mb={3}>
                             <Typography variant="h1" className="nft-project__title" mb={2}>
                                 {project.getTitle()}
@@ -78,36 +80,56 @@ export default function ProjectDetails() {
                         </Box>
 
                         <Box component="section" className="nft-project__details">
-                            <Typography component="h3" variant="h3" className="nft-project__title" mb={2}>
+                            <Typography component="h3" variant="h3" mb={2}>
                                 Details
                             </Typography>
 
-                            <List dense disablePadding className="bullet-list">
+                            <List dense disablePadding>
                                 <ListItem disableGutters>
-                                    <strong>Created at:</strong>&nbsp;{project.projectAccount.createdAt()}
+                                    <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                        <strong>Affiliate Fee:</strong>
+                                        <span>
+                                            {project.projectAccount.data.affiliate_fee_percentage}%
+                                        </span>
+                                    </Box>
                                 </ListItem>
                                 <ListItem disableGutters>
-                                    <strong>Updated at:</strong>&nbsp;{project.projectAccount.updatedAt()}
+                                    <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                        <strong>Affiliate Target:</strong>
+                                        <span>
+                                            {project.projectAccount.data.affiliate_target_in_sol}{SolTokenIcon}
+                                        </span>
+                                    </Box>
                                 </ListItem>
                                 <ListItem disableGutters>
-                                    <strong>Affiliate fee:</strong>&nbsp;{project.projectAccount.data.affiliate_fee_percentage}%
+                                    <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                        <strong>Max Affiliate Count:</strong>
+                                        <span>
+                                            {project.projectAccount.data.max_affiliate_count}
+                                        </span>
+                                    </Box>
                                 </ListItem>
                                 <ListItem disableGutters>
-                                    <strong>Affiliate target:</strong>&nbsp;{project.projectAccount.data.affiliate_target_in_sol}◎
-                                </ListItem>
-                                <ListItem disableGutters>
-                                    <strong>Max affiliate count:</strong>&nbsp;{project.projectAccount.data.max_affiliate_count}
-                                </ListItem>
-                                <ListItem disableGutters>
-                                    <strong>Affiliate count:</strong>&nbsp;{project.projectAccount.data.affiliate_count}
+                                    <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                        <strong>Affiliate Count:</strong>
+                                        <span>
+                                            {project.projectAccount.data.affiliate_count}
+                                        </span>
+                                    </Box>
                                 </ListItem>
                             </List>
                         </Box>
 
-                        {wallet.connected &&
-                            <Box component="form" className="affiliate-registration-form" onSubmit={onAffiliateRegistrationFormSubmit} mt={2}>
-                                <input type="hidden" name="owner" value={owner}/>
-                                <input type="hidden" name="candy_machine_id" value={candyMachine}/>
+                        <Box
+                            component="section"
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            className="nft-project__actions"
+                            sx={{marginTop: 3}}
+                        >
+                            {wallet.connected &&
+                                project.projectAccount.data.max_affiliate_count > project.projectAccount.data.affiliate_count &&
                                 <LoadingButton
                                     loading={isRegistering}
                                     onClick={onAffiliateRegistrationFormSubmit}
@@ -116,8 +138,19 @@ export default function ProjectDetails() {
                                 >
                                     Become an Affiliate
                                 </LoadingButton>
-                            </Box>
-                        }
+                            }
+
+                            <Link href={project.getMintLink()}>
+                                <a>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                    >
+                                        GO TO MINT
+                                    </Button>
+                                </a>
+                            </Link>
+                        </Box>
                     </Grid>
                 </Grid>
             }

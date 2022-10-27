@@ -218,9 +218,11 @@ export const PureLightTheme = createTheme({
     },
     spacing: 9,
     palette: {
+        mode: 'light',
         common: {
             black: colors.alpha.black[100], white: colors.alpha.white[100]
-        }, mode: 'light', primary: {
+        },
+        primary: {
             light: colors.primary.light, main: colors.primary.main, dark: colors.primary.dark
         }, secondary: {
             light: colors.secondary.light, main: colors.secondary.main, dark: colors.secondary.dark

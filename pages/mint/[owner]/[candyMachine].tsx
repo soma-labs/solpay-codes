@@ -5,11 +5,14 @@ import {AuthContext} from "../../../src/providers/auth-provider";
 import LoadingIcon from "../../../src/components/loading-icon";
 import {createQR} from "@solana/pay";
 import Image from "next/image";
-import {Transaction} from "@solana/web3.js";
+import {LAMPORTS_PER_SOL, Transaction} from "@solana/web3.js";
 import {PopupMessageContext, PopupMessageTypes} from "../../../src/providers/popup-message-provider";
 import getSolscanLink from "../../../src/utils/solscan-link";
-import {Box, Container, Grid, Typography} from "@mui/material";
+import {Box, CircularProgress, Container, Grid, List, ListItem, Typography} from "@mui/material";
 import {LoadingButton} from "@mui/lab";
+import useCandyMachineAccount from "../../../src/hooks/useCandyMachineAccount";
+import {SolTokenIcon} from "../../../src/program/constants";
+import getDiscountedNftPrice from "../../../src/program/utils/discount-price-calculator";
 
 export default function ProjectMint() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -19,6 +22,7 @@ export default function ProjectMint() {
     const [qrImageData, setQrImageData] = useState<string | null>(null);
     const {projectLoading, project} = useProject(owner as string, candyMachine as string);
     const [isMinting, setIsMinting] = useState<boolean>(false);
+    const candyMachineAccount = useCandyMachineAccount(candyMachine as string|null);
 
     const onMintClick = () => {
         if (isMinting) {
@@ -108,7 +112,7 @@ export default function ProjectMint() {
     return (
         <Container maxWidth="xl" sx={{p: 3}} className="nft-project nft-project--mint">
             {projectLoading ? <LoadingIcon/>: !project ? null :
-                <Grid container display="flex" justifyContent="center">
+                <Grid container display="flex" justifyContent="center" spacing={3}>
                     <Grid item xs={12} md={4}>
                         <Box className="nft-project__image-container" mb={3}>
                             {project.projectData?.image_url &&
@@ -139,9 +143,55 @@ export default function ProjectMint() {
                                 color="success"
                                 size="large"
                                 onClick={onMintClick}>
-                                {isMinting ? 'MINTING...' : 'MINT!'}
+                                {isMinting ? 'MINTING...' : 'MINT'}
                             </LoadingButton>
                         }
+                        <Box component="section" className="candy-machine-details" mt={3} sx={{width: '100%'}}>
+                            {!candyMachineAccount ?
+                                <CircularProgress size="2rem"/>
+                                :
+                                <List dense disablePadding>
+                                    <ListItem disableGutters>
+                                        <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                            <strong>Total Minted:</strong>
+                                            <span>
+                                                {candyMachineAccount.state.itemsRedeemed * 100 / candyMachineAccount.state.itemsAvailable}%
+                                                ({candyMachineAccount.state.itemsRedeemed}/{candyMachineAccount.state.itemsAvailable})
+                                            </span>
+                                        </Box>
+                                    </ListItem>
+                                    <ListItem disableGutters>
+                                        <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                            <strong>Go Live Date:</strong>
+                                            <span>
+                                                {(new Date(candyMachineAccount.state.goLiveDate.muln(1000).toNumber())).toISOString().split('T')[0]}
+                                            </span>
+                                        </Box>
+                                    </ListItem>
+                                    <ListItem disableGutters>
+                                        <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                            <strong>Full Price:</strong>
+                                            <span>
+                                                {candyMachineAccount.state.price.toNumber() / LAMPORTS_PER_SOL}{SolTokenIcon}
+                                            </span>
+                                        </Box>
+                                    </ListItem>
+                                    {candyMachineAccount.state.whitelistMintSettings && candyMachineAccount.state.whitelistMintSettings.discountPrice !== null &&
+                                        <ListItem disableGutters>
+                                            <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                                <strong>Discount Price:</strong>
+                                                <span>
+                                                    {getDiscountedNftPrice(
+                                                        candyMachineAccount.state.whitelistMintSettings.discountPrice.toNumber(),
+                                                        project.projectAccount.data.affiliate_fee_percentage
+                                                    ).toPrecision(3)}{SolTokenIcon}
+                                                </span>
+                                            </Box>
+                                        </ListItem>
+                                    }
+                                </List>
+                            }
+                        </Box>
                     </Grid>
                 </Grid>
             }

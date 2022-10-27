@@ -1,10 +1,9 @@
 import AffiliateAccount from "../../program/affiliate-accounts/affiliate-account";
 import Link from "next/link";
 import Image from "next/image";
-import {useContext, useEffect, useState} from "react";
-import {AuthContext} from "../../providers/auth-provider";
-import {getCandyMachineAccount} from "../../candy-machine/candy-machine";
+import {useEffect, useState} from "react";
 import {Box, CircularProgress, TableCell, TableRow, Link as MuiLink, Typography} from "@mui/material";
+import useCandyMachineAccount from "../../hooks/useCandyMachineAccount";
 
 export type AffiliateAccountRowPropsType = {
     affiliateAccount: AffiliateAccount,
@@ -12,20 +11,18 @@ export type AffiliateAccountRowPropsType = {
 };
 
 export default function AffiliateAccountRow({affiliateAccount, actions}: AffiliateAccountRowPropsType) {
-    const {wallet, connection} = useContext(AuthContext);
     const [mintCount, setMintCount] = useState<null|number>(null);
+    const candyMachineAccount = useCandyMachineAccount(affiliateAccount.data.candy_machine_id.toString());
 
     useEffect(() => {
         (async () => {
-            const candyMachineAccount = await getCandyMachineAccount(connection, wallet.publicKey!, affiliateAccount.data.candy_machine_id.toString());
-
             if (!candyMachineAccount || !candyMachineAccount.state.whitelistMintSettings) {
                 return;
             }
 
             setMintCount(affiliateAccount.mintCount(candyMachineAccount.state.whitelistMintSettings.discountPrice));
         })();
-    }, []);
+    }, [candyMachineAccount]);
 
     return (
         <TableRow hover>

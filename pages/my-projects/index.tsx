@@ -41,7 +41,7 @@ export default function MyProjects() {
                                         >
                                             <a>
                                                 <ProjectCard
-                                                    title={project.projectAccount.data.title || project.projectAccount.data.candy_machine_id.toString()}
+                                                    title={project.getTitle()}
                                                     description={project.projectData?.description}
                                                     imageUrl={project.projectData?.image_url}
                                                 />

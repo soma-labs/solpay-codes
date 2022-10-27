@@ -35,6 +35,9 @@ const MenuWrapper = styled(Box)(({theme}) => `
 
 const SubMenuWrapper = styled(Box)(({theme}) => `
     .MuiList-root {
+      a {
+        width: 100%;
+      }
 
       .MuiListItem-root {
         padding: 1px 0;
@@ -270,7 +273,7 @@ function SidebarMenu() {
                                                     <Button
                                                         disableRipple
                                                     >
-                                                        {project.projectAccount.data.title || project.projectAccount.data.candy_machine_id.toString()}
+                                                        {project.getTitle()}
                                                     </Button>
                                                 </a>
                                             </Link>

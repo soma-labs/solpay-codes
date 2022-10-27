@@ -55,12 +55,10 @@ export default function Home() {
                             {
                                 projects.map((project, index) =>
                                     <Grid key={index} item xs={3}>
-                                        <Link
-                                            href={`/projects/${project.projectAccount.data.project_owner_pubkey.toString()}/${project.projectAccount.data.candy_machine_id.toString()}`}
-                                        >
+                                        <Link href={project.getLink()}>
                                             <a>
                                                 <ProjectCard
-                                                    title={project.projectAccount.data.title || project.projectAccount.data.candy_machine_id.toString()}
+                                                    title={project.getTitle()}
                                                     description={project.projectData?.description}
                                                     imageUrl={project.projectData?.image_url}
                                                 />

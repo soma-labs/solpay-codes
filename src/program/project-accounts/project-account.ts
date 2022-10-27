@@ -72,10 +72,10 @@ export default class ProjectAccount {
     }
 
     createdAt(): string {
-        return (new Date(this.data.created_at.muln(1000).toNumber())).toISOString();
+        return (new Date(this.data.created_at.muln(1000).toNumber())).toISOString().split('T')[0];
     }
 
     updatedAt(): string {
-        return (new Date(this.data.updated_at.muln(1000).toNumber())).toISOString();
+        return (new Date(this.data.updated_at.muln(1000).toNumber())).toISOString().split('T')[0];
     }
 }
