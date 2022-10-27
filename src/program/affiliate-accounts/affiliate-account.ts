@@ -102,6 +102,14 @@ export default class AffiliateAccount {
         return (100 * (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) / this.project.projectAccount.data.affiliate_target_in_sol).toFixed(2);
     }
 
+    getProjectLink(): string {
+        return `${process.env.NEXT_PUBLIC_VERCEL_URL}/projects/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}`;
+    }
+
+    getProjectMintLink(): string {
+        return `${process.env.NEXT_PUBLIC_VERCEL_URL}/mint/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}?affiliate=${this.data.affiliate_pubkey.toString()}`;
+    }
+
     mintCount(whiteListNftPrice: BN | null): number {
         if (!this.project || !whiteListNftPrice) {
             return 0;

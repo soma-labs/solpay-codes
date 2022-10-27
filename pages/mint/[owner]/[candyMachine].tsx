@@ -8,6 +8,8 @@ import Image from "next/image";
 import {Transaction} from "@solana/web3.js";
 import {PopupMessageContext, PopupMessageTypes} from "../../../src/providers/popup-message-provider";
 import getSolscanLink from "../../../src/utils/solscan-link";
+import {Box, Container, Grid, Typography} from "@mui/material";
+import {LoadingButton} from "@mui/lab";
 
 export default function ProjectMint() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -104,41 +106,45 @@ export default function ProjectMint() {
     }, [owner, candyMachine]);
 
     return (
-        <section className="nft-project nft-project--mint d-flex flex-wrap justify-content-center">
+        <Container maxWidth="xl" sx={{p: 3}} className="nft-project nft-project--mint">
             {projectLoading ? <LoadingIcon/>: !project ? null :
-                <>
-                    <div className="col-12 col-md-4">
-                        <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
+                <Grid container display="flex" justifyContent="center">
+                    <Grid item xs={12} md={4}>
+                        <Box className="nft-project__image-container" mb={3}>
                             {project.projectData?.image_url &&
                                 <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
                             }
-                        </div>
-                        <header className="nft-project__header mb-5">
-                            <h1 className="nft-project__title">
+                        </Box>
+                        <Box component="header" className="nft-project__header" mb={3}>
+                            <Typography variant="h1" className="nft-project__title" mb={2}>
                                 {project.getTitle()}
-                            </h1>
-                            <div className="nft-project__description">
+                            </Typography>
+
+                            <Typography component="p" className="nft-project__description">
                                 {project.projectData?.description}
-                            </div>
-                        </header>
-                    </div>
-                    <div className="col-12 col-md-4 ps-4 d-flex flex-column align-items-center">
+                            </Typography>
+                        </Box>
+                    </Grid>
+                    <Grid item xs={12} md={4} display="flex" flexDirection="column" alignItems="center">
                         {qrImageData &&
-                            <div className="mb-5">
+                            <Box mb={2}>
                                 <Image src={qrImageData} width={512} height={512} alt=""/>
-                            </div>
+                            </Box>
                         }
                         {wallet.connected &&
-                            <button
-                                disabled={isMinting}
-                                className={`button button--mint ${isMinting ? 'button--is-minting' : ''}`}
+                            <LoadingButton
+                                fullWidth
+                                loading={isMinting}
+                                variant="contained"
+                                color="success"
+                                size="large"
                                 onClick={onMintClick}>
                                 {isMinting ? 'MINTING...' : 'MINT!'}
-                            </button>
+                            </LoadingButton>
                         }
-                    </div>
-                </>
+                    </Grid>
+                </Grid>
             }
-        </section>
+        </Container>
     );
 }

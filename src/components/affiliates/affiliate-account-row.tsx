@@ -7,12 +7,11 @@ import {getCandyMachineAccount} from "../../candy-machine/candy-machine";
 import {Box, CircularProgress, TableCell, TableRow, Link as MuiLink, Typography} from "@mui/material";
 
 export type AffiliateAccountRowPropsType = {
-    rowIndex: number,
     affiliateAccount: AffiliateAccount,
     actions: any[]
 };
 
-export default function AffiliateAccountRow({rowIndex, affiliateAccount, actions}: AffiliateAccountRowPropsType) {
+export default function AffiliateAccountRow({affiliateAccount, actions}: AffiliateAccountRowPropsType) {
     const {wallet, connection} = useContext(AuthContext);
     const [mintCount, setMintCount] = useState<null|number>(null);
 
@@ -20,18 +19,18 @@ export default function AffiliateAccountRow({rowIndex, affiliateAccount, actions
         (async () => {
             const candyMachineAccount = await getCandyMachineAccount(connection, wallet.publicKey!, affiliateAccount.data.candy_machine_id.toString());
 
-            if (!candyMachineAccount) {
+            if (!candyMachineAccount || !candyMachineAccount.state.whitelistMintSettings) {
                 return;
             }
 
-            setMintCount(affiliateAccount.mintCount(candyMachineAccount.state.whitelistMintSettings!.discountPrice));
+            setMintCount(affiliateAccount.mintCount(candyMachineAccount.state.whitelistMintSettings.discountPrice));
         })();
     }, []);
 
     return (
         <TableRow hover>
             <TableCell>
-                <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
+                <Link key={0} href={affiliateAccount.getProjectLink()}>
                     <a target="_blank">
                         <Box sx={{width: 50, height: 50, position: 'relative'}}>
                             <Image src={affiliateAccount.project?.projectData?.image_url as string} className="affiliate-accounts-table__image" alt="NFT project image" layout="fill"/>
@@ -40,7 +39,7 @@ export default function AffiliateAccountRow({rowIndex, affiliateAccount, actions
                 </Link>
             </TableCell>
             <TableCell>
-                <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
+                <Link key={0} href={affiliateAccount.getProjectLink()}>
                     <a target="_blank">
                         <Typography>
                             <MuiLink component="span">
@@ -59,7 +58,7 @@ export default function AffiliateAccountRow({rowIndex, affiliateAccount, actions
                 </Typography>
             </TableCell>
             <TableCell align="right">
-                {actions.map((action: any, index: number) => <span key={index}>{action.call(null, affiliateAccount)}</span>)}
+                {actions.map((action: any, index: number) => <Box component="span" ml={1} key={index}>{action.call(null, affiliateAccount)}</Box>)}
             </TableCell>
         </TableRow>
     );

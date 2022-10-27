@@ -12,6 +12,9 @@ import AffiliateAccountsTable from "../src/components/affiliates/affiliate-accou
 import AuthenticatedPage from "../src/components/authenticated-page";
 import {Box, Button, Card, CardHeader, Container, Divider, Typography} from "@mui/material";
 import PageTitleWrapper from "../src/tokyo-dashboard/components/PageTitleWrapper";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import {LoadingButton} from "@mui/lab";
 
 export default function MyEarnings() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -26,40 +29,95 @@ export default function MyEarnings() {
         paginationOptions
     );
 
-    const onClaimReward = async (affiliateAccount: AffiliateAccount) => {
-        try {
-            await redeemReward(
-                {
-                    owner: affiliateAccount.data.project_owner_pubkey,
-                    candyMachineId: affiliateAccount.data.candy_machine_id,
-                },
-                wallet,
-                connection
-            );
+    const ClaimRewardButton = (affiliateAccount: AffiliateAccount) => {
+        const [isClaimingReward, setIsClaimingReward] = useState<boolean>(false);
 
-            setRefreshAffiliateAccounts(Date.now());
-        } catch (e) {
-            if (e instanceof Error) {
-                setMessage(e.message, PopupMessageTypes.Error);
-            } else {
-                console.log(e);
+        const onClaimReward = async (affiliateAccount: AffiliateAccount) => {
+            if (isClaimingReward) {
+                return;
             }
-        }
+
+            setIsClaimingReward(true);
+
+            try {
+                await redeemReward(
+                    {
+                        owner: affiliateAccount.data.project_owner_pubkey,
+                        candyMachineId: affiliateAccount.data.candy_machine_id,
+                    },
+                    wallet,
+                    connection
+                );
+
+                setRefreshAffiliateAccounts(Date.now());
+            } catch (e) {
+                if (e instanceof Error) {
+                    setMessage(e.message, PopupMessageTypes.Error);
+                } else {
+                    console.log(e);
+                }
+
+            }
+
+            setIsClaimingReward(false);
+        };
+
+        return (
+            <>
+                {affiliateAccount.hasReachedTarget() ?
+                    <LoadingButton
+                        loading={isClaimingReward}
+                        variant="contained"
+                        size="small"
+                        color="success"
+                        startIcon={<MonetizationOnIcon/>}
+                        onClick={onClaimReward.bind(null, affiliateAccount)}
+                    >
+                        Claim Reward
+                    </LoadingButton>
+                    :
+                    <span style={{ cursor: 'not-allowed' }} title="Claim not available yet">
+                        <Button
+                            disabled
+                            size="small"
+                            variant="outlined"
+                            startIcon={<MonetizationOnIcon/>}
+                        >
+                            Claim Reward
+                        </Button>
+                    </span>
+                }
+            </>
+        );
     };
 
-    const claimRewardButton = (affiliateAccount: AffiliateAccount) =>
-        affiliateAccount.hasReachedTarget() ?
-            <Button
-                variant="contained"
-                size="small"
-                onClick={onClaimReward.bind(null, affiliateAccount)}
-            >
-                Claim Reward
-            </Button>
-            :
-            <span style={{ cursor: 'not-allowed' }} title="Claim not available yet">
-                <Button disabled size="small" variant="outlined">Claim Reward</Button>
-            </span>;
+    const CopyAffiliateLinkButton = (affiliateAccount: AffiliateAccount) => {
+        const [linkCopied, setLinkCopied] = useState<boolean>(false);
+        const affiliateLink = affiliateAccount.getProjectMintLink();
+
+        const copyLinkToClipboard = async (e: any) => {
+            e.preventDefault();
+
+            try {
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 3000);
+
+                await navigator.clipboard.writeText(affiliateLink);
+            } catch (e) {
+                setMessage(e, PopupMessageTypes.Error);
+            }
+        };
+
+        return (
+            <Link href={affiliateLink}>
+                <a onClick={copyLinkToClipboard}>
+                    <Button startIcon={<ContentCopyIcon/>} size="small">
+                        {linkCopied ?  `Link copied` : `Copy Affiliate Link`}
+                    </Button>
+                </a>
+            </Link>
+        );
+    };
 
     return (
         <AuthenticatedPage>
@@ -84,7 +142,7 @@ export default function MyEarnings() {
 
                             <Divider/>
 
-                            <AffiliateAccountsTable affiliateAccounts={affiliateAccounts} actions={[claimRewardButton]}/>
+                            <AffiliateAccountsTable affiliateAccounts={affiliateAccounts} actions={[ClaimRewardButton, CopyAffiliateLinkButton]}/>
 
                             {pagination.pageCount < 2 ? null :
                                 <Box p={2}>

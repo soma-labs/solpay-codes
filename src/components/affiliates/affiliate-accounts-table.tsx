@@ -26,7 +26,6 @@ export default function AffiliateAccountsTable({affiliateAccounts,  actions}: Af
                             (affiliateAccount, index) =>
                                 <AffiliateAccountRow
                                     key={index}
-                                    rowIndex={index}
                                     affiliateAccount={affiliateAccount}
                                     actions={actions}
                                 />

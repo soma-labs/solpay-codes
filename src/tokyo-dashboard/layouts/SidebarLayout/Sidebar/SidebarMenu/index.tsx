@@ -214,7 +214,7 @@ function SidebarMenu() {
                                                 disableRipple
                                                 startIcon={<AttachMoneyIcon/>}
                                             >
-                                                My earnings
+                                                My Earnings
                                             </Button>
                                         </a>
                                     </Link>
