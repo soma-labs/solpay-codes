@@ -8,7 +8,7 @@ import {ProjectAccountDiscriminator, ProjectTitleMaxLength} from "./project-acco
 export type ProjectOrderColumnsType = 'title' | 'createdAt';
 
 export const ProjectOrderColumnsOptions = {
-    'createdAt': 'Created at',
+    'createdAt': 'Date',
     'title': 'Title',
 };
 

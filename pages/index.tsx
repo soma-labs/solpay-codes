@@ -1,5 +1,4 @@
 import Link from "next/link";
-import LoadingIcon from "../src/components/loading-icon";
 import ProjectCard from "../src/components/projects/project-card";
 import useProjects from "../src/hooks/useProjects";
 import SimplePagination from "../src/components/simple-pagination";
@@ -12,6 +11,9 @@ import {
 import AccountsOrderFilter from "../src/components/accounts-order-filter";
 import AccountsSearchFilter from "../src/components/accounts-search-filter";
 import useQueryParamsSearch from "../src/hooks/useQueryParamsSearch";
+import {Box, Container, Grid} from "@mui/material";
+import PageTitleWrapper from "../src/tokyo-dashboard/components/PageTitleWrapper";
+import LoadingIcon from "../src/components/loading-icon";
 
 export default function Home() {
     const queryParamsPagination = useQueryParamsPagination();
@@ -29,43 +31,51 @@ export default function Home() {
     );
 
     return (
-        <section className="nft-projects">
-            <div className="px-3">
-                <div className="accounts-filter accounts-filter--projects d-flex justify-content-between align-items-center">
+        <>
+            <PageTitleWrapper>
+                <Box className="accounts-filter accounts-filter--projects" display="flex" justifyContent="space-between">
                     <AccountsSearchFilter label="Search by title" defaultSearch={queryParamsSearch}/>
                     <AccountsOrderFilter
                         columns={ProjectOrderColumnsOptions}
                         defaultOrderBy={queryParamsOrdering?.orderBy}
                         defaultOrderDir={queryParamsOrdering?.orderDir}
                     />
-                </div>
-            </div>
-            {projectsLoading ?
-                <LoadingIcon/>
-                :
-                <>
-                    <div className="d-flex flex-wrap">
-                        {
-                            projects.map((project, index) =>
-                                <div key={index} className="nft-project-item col-12 col-md-3">
-                                    <ProjectCard
-                                        title={project.projectAccount.data.title || project.projectAccount.data.candy_machine_id.toString()}
-                                        description={project.projectData?.description}
-                                        imageUrl={project.projectData?.image_url}
-                                        actions={[
-                                            <Link
-                                                key={0}
-                                                href={`/projects/${project.projectAccount.data.project_owner_pubkey.toString()}/${project.projectAccount.data.candy_machine_id.toString()}`}>
-                                                <a className="button button--hollow">View project</a>
-                                            </Link>
-                                        ]}
-                                    />
-                                </div>)
-                        }
-                    </div>
-                    <SimplePagination pagination={pagination} classVariation={`project-list`}/>
-                </>
-            }
-        </section>
+                </Box>
+            </PageTitleWrapper>
+
+            <Container maxWidth="xl" sx={{paddingBottom: 4}}>
+                {projectsLoading ? <LoadingIcon/> :
+                    <Box>
+                        <Grid
+                            container
+                            direction="row"
+                            spacing={4}
+                            mb={4}
+                        >
+                            {
+                                projects.map((project, index) =>
+                                    <Grid key={index} item xs={3}>
+                                        <Link
+                                            href={`/projects/${project.projectAccount.data.project_owner_pubkey.toString()}/${project.projectAccount.data.candy_machine_id.toString()}`}
+                                        >
+                                            <a>
+                                                <ProjectCard
+                                                    title={project.projectAccount.data.title || project.projectAccount.data.candy_machine_id.toString()}
+                                                    description={project.projectData?.description}
+                                                    imageUrl={project.projectData?.image_url}
+                                                />
+                                            </a>
+                                        </Link>
+                                    </Grid>
+                                )
+                            }
+                        </Grid>
+                        <Grid item xs={12}>
+                            <SimplePagination pagination={pagination} classVariation={`project-list`}/>
+                        </Grid>
+                    </Box>
+                }
+            </Container>
+        </>
     );
 }

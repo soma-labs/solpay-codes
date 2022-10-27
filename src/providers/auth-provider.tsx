@@ -5,12 +5,13 @@ import {Connection, PublicKey} from "@solana/web3.js";
 import {WalletAdapter, WalletNotReadyError} from "@solana/wallet-adapter-base";
 import Image from "next/image";
 import {PopupMessageContext, PopupMessageTypes} from "./popup-message-provider";
+import {Box, Button, List, ListItem, Modal, Typography} from "@mui/material";
 
 export type AuthContextType = {
     wallet: WalletAdapter,
     connection: Connection,
-    login: () => Promise<any>,
-    logout: () => Promise<any>,
+    showWalletsModal: () => void,
+    logout: () => Promise<void>,
 };
 
 export const AuthContext = React.createContext<AuthContextType>({} as AuthContextType);
@@ -41,13 +42,8 @@ export default function AuthProvider({children}: {children: any}) {
         .on('connect', (publicKey: PublicKey) => setIsConnected(true))
         .on('disconnect', () => setIsConnected(false));
 
-    const login = async () => setModalVisible(true);
-    const logout = async () => {
-        await wallet.disconnect();
-        setChosenWallet(null);
-        window.localStorage.removeItem(ChosenWalletAdapterKey);
-    };
-    const onModalOverlayClick = (e: any) => setModalVisible(!e.target.classList.contains('wallets-modal'));
+    const showWalletsModal = () => setModalVisible(true);
+    const hideWalletsModal = () => setModalVisible(false);
     const loginWithWallet = async (walletAdapter: WalletAdapter) => {
         try {
             await walletAdapter.connect();
@@ -68,11 +64,16 @@ export default function AuthProvider({children}: {children: any}) {
             }
         }
     };
+    const logout = async () => {
+        await wallet.disconnect();
+        setChosenWallet(null);
+        window.localStorage.removeItem(ChosenWalletAdapterKey);
+    };
 
     const defaultAuthContextValue: AuthContextType = {
         wallet,
         connection,
-        login,
+        showWalletsModal: showWalletsModal,
         logout,
     };
 
@@ -96,25 +97,43 @@ export default function AuthProvider({children}: {children: any}) {
     return (
         <AuthContext.Provider value={defaultAuthContextValue}>
             {children}
-            <div onClick={onModalOverlayClick} className={`wallets-modal ${modalVisible ? `wallets-modal--visible` : ``} d-flex justify-content-center align-items-center`}>
-                <div className="wallets-modal__inner d-flex flex-column">
-                    <ul className="wallet-list">
+            <Modal
+                open={modalVisible}
+                onClose={hideWalletsModal}
+                aria-labelledby="wallets-modal-title"
+                aria-describedby="wallets-modal-description"
+            >
+                <Box sx={{
+                    position: 'absolute' as 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 300,
+                    bgcolor: '#fff',
+                    boxShadow: 24,
+                    p: 2,
+                }}>
+                    <Typography id="wallets-modal-title" variant="h2" component="h2" textAlign="center">
+                        Choose wallet
+                    </Typography>
+                    <List>
                         {WalletAdapters.map((walletAdapter, index) =>
-                            <li key={index} className="wallet-list__item">
-                                <button
+                            <ListItem key={index}>
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    fullWidth
+                                    sx={{display: 'flex', alignItems: 'center', justifyContent: 'flex-start'}}
+                                    startIcon={<Image src={walletAdapter.icon} alt="" width={32} height={32} className="wallet-button__icon"/>}
                                     onClick={loginWithWallet.bind(null, walletAdapter)}
-                                    className="wallet-button d-flex align-items-center"
                                 >
-                                    <Image src={walletAdapter.icon} alt="" width={32} height={32} className="wallet-button__icon"/>
-                                    <span className="wallet-button__name">
-                                        {walletAdapter.name}
-                                    </span>
-                                </button>
-                            </li>
+                                    {walletAdapter.name}
+                                </Button>
+                            </ListItem>
                         )}
-                    </ul>
-                </div>
-            </div>
+                    </List>
+                </Box>
+            </Modal>
         </AuthContext.Provider>
     );
 };

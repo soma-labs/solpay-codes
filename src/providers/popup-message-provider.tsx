@@ -1,13 +1,16 @@
 import React, {useState} from "react";
+import Snackbar from '@mui/material/Snackbar';
+import {Alert} from "@mui/material";
+import {AlertColor} from "@mui/material/Alert/Alert";
 
 export type PopupMessageContextType = {
     setMessage: any,
 };
 
 export enum PopupMessageTypes {
-    Error = 'danger',
     Success = 'success',
-    Notification = 'primary',
+    Error = 'error',
+    Notification = 'info',
 }
 
 export const PopupMessageContext = React.createContext<PopupMessageContextType>({} as PopupMessageContextType);
@@ -32,12 +35,11 @@ export default function PopupMessageProvider({children}: {children: any}) {
         <PopupMessageContext.Provider value={defaultValue}>
             {children}
             {!message ? null :
-                <div className={`popup-message popup-message--${type}`}>
-                    <div className={`alert alert-${type} alert-dismissible d-flex" role="alert`}>
-                        <div className="popup-message__text" dangerouslySetInnerHTML={{__html: message}}/>
-                        <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close" onClick={dismissMessage}></button>
-                    </div>
-                </div>
+                <Snackbar open={true} anchorOrigin={{vertical: 'bottom', horizontal: 'right'}} onClose={dismissMessage}>
+                    <Alert variant="filled" onClose={dismissMessage} severity={type} sx={{ width: '100%' }}>
+                        <span dangerouslySetInnerHTML={{__html: message}}/>
+                    </Alert>
+                </Snackbar>
             }
         </PopupMessageContext.Provider>
     );

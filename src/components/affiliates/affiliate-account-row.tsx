@@ -4,6 +4,7 @@ import Image from "next/image";
 import {useContext, useEffect, useState} from "react";
 import {AuthContext} from "../../providers/auth-provider";
 import {getCandyMachineAccount} from "../../candy-machine/candy-machine";
+import {Box, CircularProgress, TableCell, TableRow, Link as MuiLink, Typography} from "@mui/material";
 
 export type AffiliateAccountRowPropsType = {
     rowIndex: number,
@@ -28,31 +29,38 @@ export default function AffiliateAccountRow({rowIndex, affiliateAccount, actions
     }, []);
 
     return (
-        <tr>
-            <td>{rowIndex + 1}</td>
-            <td>
+        <TableRow hover>
+            <TableCell>
                 <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
-                    <a>
-                        <Image src={affiliateAccount.project?.projectData?.image_url as string} className="affiliate-accounts-table__image" alt="NFT project image" width="50" height="50"/>
+                    <a target="_blank">
+                        <Box sx={{width: 50, height: 50, position: 'relative'}}>
+                            <Image src={affiliateAccount.project?.projectData?.image_url as string} className="affiliate-accounts-table__image" alt="NFT project image" layout="fill"/>
+                        </Box>
                     </a>
                 </Link>
-            </td>
-            <td>
+            </TableCell>
+            <TableCell>
                 <Link key={0} href={`/projects/${affiliateAccount.data.project_owner_pubkey.toString()}/${affiliateAccount.data.candy_machine_id.toString()}`}>
-                    <a className="link">
-                        {affiliateAccount.project?.projectAccount.data.title ?? affiliateAccount.data.candy_machine_id.toString()}
+                    <a target="_blank">
+                        <Typography>
+                            <MuiLink component="span">
+                                {affiliateAccount.project?.projectAccount.data.title ?? affiliateAccount.data.candy_machine_id.toString()}
+                            </MuiLink>
+                        </Typography>
                     </a>
                 </Link>
-            </td>
-            <td>
-                {mintCount ?? 'loading...'}
-            </td>
-            <td>
-                {affiliateAccount.targetProgress()}%
-            </td>
-            <td>
+            </TableCell>
+            <TableCell>
+                {mintCount ? <Typography>{mintCount}</Typography> : <CircularProgress size="1rem"/>}
+            </TableCell>
+            <TableCell>
+                <Typography>
+                    {affiliateAccount.targetProgress()}%
+                </Typography>
+            </TableCell>
+            <TableCell align="right">
                 {actions.map((action: any, index: number) => <span key={index}>{action.call(null, affiliateAccount)}</span>)}
-            </td>
-        </tr>
+            </TableCell>
+        </TableRow>
     );
 }

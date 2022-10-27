@@ -5,8 +5,8 @@ import {DataSlice} from "@solana/web3.js";
 export type OrderDirType = 'asc' | 'desc';
 
 export const OrderDirOptions = {
-    'asc': `&#129057;`,
-    'desc': `&#129059;`,
+    'asc': `ASC`,
+    'desc': `DESC`,
 };
 
 export type OrderMethodType = (

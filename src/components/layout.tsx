@@ -10,7 +10,7 @@ import Image from "next/image";
 export default function Layout({ children }: { children: any }) {
     const {
         wallet,
-        login,
+        showWalletsModal,
         logout
     } = useContext(AuthContext);
     const {walletProjects} = useContext(WalletProjectsContext);
@@ -32,7 +32,7 @@ export default function Layout({ children }: { children: any }) {
                                 <a className="button button--hollow button--register-project me-3">Register your project</a>
                             </Link>
                         }
-                        <button onClick={!wallet.connected ? login : logout} className={`cma-login-button cma-login-button--${!wallet.connected ? `login` : `logout`}`}>
+                        <button onClick={!wallet.connected ? showWalletsModal : logout} className={`cma-login-button cma-login-button--${!wallet.connected ? `login` : `logout`}`}>
                             {!wallet.connected ? `Login with wallet` : `Logout`}
                         </button>
                     </nav>

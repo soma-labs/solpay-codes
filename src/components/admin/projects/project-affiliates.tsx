@@ -5,6 +5,8 @@ import {AuthContext} from "../../../providers/auth-provider";
 import closeAffiliateAccount from "../../../program/affiliate-accounts/close-affiliate-account";
 import useAffiliateAccounts from "../../../hooks/useAffiliateAccounts";
 import AffiliateAccountsTable from "../../affiliates/affiliate-accounts-table";
+import {Button, Card, CardHeader, Divider, IconButton} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function ProjectAffiliates({owner, candyMachine}: {
     owner: string,
@@ -46,23 +48,26 @@ export default function ProjectAffiliates({owner, candyMachine}: {
     };
 
     const closeAffiliateAccountButton = (affiliateAccount: AffiliateAccount) =>
-        <button
-            className="button button--hollow button--danger"
+        <IconButton
+            aria-label="Close Affiliate Account"
+            color="error"
+            size="small"
+            title="Close Affiliate Account"
             onClick={onCloseAffiliateAccountAction.bind(null, affiliateAccount)}
         >
-            Close affiliate account
-        </button>;
+            <DeleteIcon fontSize="small"/>
+        </IconButton>;
 
     return (
-        <>
-            {affiliateAccounts.length > 0 ?
-                <section className="nft-project__affiliates">
-                    <h4>Nb of affiliates: {affiliateAccounts.length}</h4>
+        <Card>
+            <CardHeader title={`Affiliates (${affiliateAccounts.length})`}/>
 
-                    <AffiliateAccountsTable affiliateAccounts={affiliateAccounts} actions={[closeAffiliateAccountButton]}/>
-                </section>
+            <Divider/>
+
+            {affiliateAccounts.length > 0 ?
+                <AffiliateAccountsTable affiliateAccounts={affiliateAccounts} actions={[closeAffiliateAccountButton]}/>
                 : null
             }
-        </>
+        </Card>
     );
 }

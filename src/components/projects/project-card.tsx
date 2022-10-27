@@ -1,37 +1,42 @@
-import Image from "next/image";
+import {Card, CardActionArea, CardActions, CardContent, CardMedia, Typography} from "@mui/material";
 
 type ProjectCardPropsType = {
     title?: string,
     description?: string,
     imageUrl?: string,
-    actions: any[],
+    actions?: any[],
 };
 
 export default function ProjectCard(props: ProjectCardPropsType) {
     return (
-        <article className="nft-project nft-project--loop d-flex flex-column justify-content-between">
-            <header className="nft-project__header mb-3">
+        <Card
+            component="article"
+            className="nft-project nft-project--loop"
+        >
+            <CardActionArea disableRipple>
                 {props.imageUrl &&
-                    <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
-                        <Image src={props.imageUrl} className="nft-project__image" alt="NFT project image" layout="fill"/>
-                    </div>
+                    <CardMedia
+                        component="img"
+                        image={props.imageUrl}
+                        alt="NFT project image"
+                        sx={{height: '20rem'}}
+                    />
                 }
-                {props.title &&
-                    <h3 className="nft-project__title text-center">
+                <CardContent>
+                    <Typography gutterBottom variant="h3" component="h3" className="nft-project__title">
                         {props.title}
-                    </h3>
-                }
-                {props.description &&
-                    <div className="nft-project__description">
+                    </Typography>
+                    <Typography variant="body2" className="nft-project__description">
                         {props.description}
-                    </div>
-                }
-            </header>
-            {props.actions.length &&
-                <div className="nft-project__actions d-flex justify-content-between">
+                    </Typography>
+                </CardContent>
+            </CardActionArea>
+
+            {props.actions &&
+                <CardActions>
                     {props.actions}
-                </div>
+                </CardActions>
             }
-        </article>
+        </Card>
     );
 }

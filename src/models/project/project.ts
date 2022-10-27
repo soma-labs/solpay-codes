@@ -9,4 +9,8 @@ export default class Project {
         this.projectAccount = projectAccount;
         this.projectData = projectData;
     }
+
+    getTitle(): string {
+        return this.projectAccount.data.title || `Candy Machine: ${this.projectAccount.data.candy_machine_id.toString()}`;
+    }
 }

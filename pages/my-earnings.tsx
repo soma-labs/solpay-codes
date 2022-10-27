@@ -9,6 +9,9 @@ import {PopupMessageContext, PopupMessageTypes} from "../src/providers/popup-mes
 import SimplePagination from "../src/components/simple-pagination";
 import useQueryParamsPagination from "../src/hooks/useQueryParamsPagination";
 import AffiliateAccountsTable from "../src/components/affiliates/affiliate-accounts-table";
+import AuthenticatedPage from "../src/components/authenticated-page";
+import {Box, Button, Card, CardHeader, Container, Divider, Typography} from "@mui/material";
+import PageTitleWrapper from "../src/tokyo-dashboard/components/PageTitleWrapper";
 
 export default function MyEarnings() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -46,31 +49,51 @@ export default function MyEarnings() {
 
     const claimRewardButton = (affiliateAccount: AffiliateAccount) =>
         affiliateAccount.hasReachedTarget() ?
-            <button
-                className="button button--hollow"
+            <Button
+                variant="contained"
+                size="small"
                 onClick={onClaimReward.bind(null, affiliateAccount)}
             >
-                Claim reward
-            </button>
+                Claim Reward
+            </Button>
             :
-            'Not available yet';
+            <span style={{ cursor: 'not-allowed' }} title="Claim not available yet">
+                <Button disabled size="small" variant="outlined">Claim Reward</Button>
+            </span>;
 
     return (
-        <section className="my-earnings">
-            {!wallet.connected ?
-                <h3>You must be logged in to view your earnings.</h3> :
-                affiliateAccountsLoading ?
-                    <LoadingIcon/> :
+        <AuthenticatedPage>
+            <PageTitleWrapper>
+                <Typography variant="h3" component="h3">
+                    My Earnings
+                </Typography>
+            </PageTitleWrapper>
+
+            <Container maxWidth="md" sx={{paddingBottom: 4}}>
+                {affiliateAccountsLoading ? <LoadingIcon/> :
                     !affiliateAccounts.length ?
-                        <h4>
-                            You must register as an affiliate with one of our <Link href={`/`}><a className="link">projects</a></Link> before you can see your earnings.
-                        </h4>
+                        <Typography variant="h4" component="h4">
+                            You must register as an affiliate with one of our
+                            <Link href={`/`}><a className="link">projects</a></Link>
+                            before you can see your earnings.
+                        </Typography>
                         :
-                        <>
+
+                        <Card>
+                            <CardHeader title="Affiliated NFT Projects"/>
+
+                            <Divider/>
+
                             <AffiliateAccountsTable affiliateAccounts={affiliateAccounts} actions={[claimRewardButton]}/>
-                            <SimplePagination pagination={pagination} classVariation={`earnings-list`}/>
-                        </>
-            }
-        </section>
+
+                            {pagination.pageCount < 2 ? null :
+                                <Box p={2}>
+                                    <SimplePagination pagination={pagination} classVariation={`earnings-list`}/>
+                                </Box>
+                            }
+                        </Card>
+                }
+            </Container>
+        </AuthenticatedPage>
     );
 }

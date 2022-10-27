@@ -1,13 +1,13 @@
 import {useEffect, useRef} from "react";
 import {useRouter} from "next/router";
+import {Box, Button, IconButton, TextField} from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function AccountsSearchFilter({label, defaultSearch}: {label: string, defaultSearch?: string}) {
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
-    const onSearch = async (e: any) => {
-        e.preventDefault();
-
-        if (inputRef.current?.value.trim() === '') {
+    const updateRouterSearchQuery = async (search: string): Promise<void> => {
+        if (search.trim() === '') {
             delete router.query.search;
         } else {
             router.query.search = inputRef.current?.value;
@@ -18,7 +18,14 @@ export default function AccountsSearchFilter({label, defaultSearch}: {label: str
             query: router.query
         }, undefined, {shallow: true});
     };
-    const clearInput = () => inputRef.current && (inputRef.current.value = '');
+    const onSearch = async (e: any) => {
+        e.preventDefault();
+        updateRouterSearchQuery(inputRef.current!.value);
+    };
+    const clearInput = () => {
+        inputRef.current && (inputRef.current.value = '');
+        updateRouterSearchQuery('');
+    };
 
     useEffect(() => {
         if (!defaultSearch) {
@@ -27,17 +34,22 @@ export default function AccountsSearchFilter({label, defaultSearch}: {label: str
     }, [defaultSearch]);
 
     return (
-        <form onSubmit={onSearch} className="form d-flex align-items-center">
-            <input
-                ref={inputRef}
-                type="text"
-                name="accounts_filter_search"
-                className="accounts-filter-input form-control me-2"
-                placeholder={label}
+        <Box component="form" onSubmit={onSearch} display="flex" alignItems="center">
+            <TextField
+                inputRef={inputRef}
+                label={label}
+                sx={{mr: 1}}
+                size="small"
                 defaultValue={defaultSearch}
             />
-            <button className="button button--hollow">Search</button>
-            <button className="button button--hollow ms-2" onClick={clearInput.bind(null)} title="Clear search">&times;</button>
-        </form>
+
+            <Button variant="contained" className="button button--hollow" sx={{mr: 1}} size="small">
+                Search
+            </Button>
+
+            <IconButton onClick={clearInput.bind(null)} title="Clear search" size="small" color="secondary">
+                <CloseIcon fontSize="small"/>
+            </IconButton>
+        </Box>
     );
 }

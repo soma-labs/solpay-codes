@@ -1,7 +1,11 @@
+import {Container, Typography} from "@mui/material";
+
 export default function Custom404() {
     return (
-        <section className="error-page error-page--404 d-flex justify-content-center align-items-center">
-            <h1>404 - Page Not Found</h1>
-        </section>
+        <Container maxWidth="xl" sx={{p: 4}}>
+            <Typography variant="h1" component="h1">
+                404 - Page Not Found
+            </Typography>
+        </Container>
     );
 }

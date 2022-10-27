@@ -1,3 +1,4 @@
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import AffiliateAccount from "../../program/affiliate-accounts/affiliate-account";
 import AffiliateAccountRow from "./affiliate-account-row";
 
@@ -8,30 +9,31 @@ export type AffiliateAccountsTablePropsType = {
 
 export default function AffiliateAccountsTable({affiliateAccounts,  actions}: AffiliateAccountsTablePropsType) {
     return (
-        <table className="affiliate-accounts-table table table-dark table-hover">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Image</th>
-                    <th>Title</th>
-                    <th>Mints</th>
-                    <th>Progress</th>
-                    <td>Actions</td>
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    affiliateAccounts.map(
-                        (affiliateAccount, index) =>
-                            <AffiliateAccountRow
-                                key={index}
-                                rowIndex={index}
-                                affiliateAccount={affiliateAccount}
-                                actions={actions}
-                            />
-                    )
-                }
-            </tbody>
-        </table>
+        <TableContainer>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Image</TableCell>
+                        <TableCell>Title</TableCell>
+                        <TableCell>Mints</TableCell>
+                        <TableCell>Progress</TableCell>
+                        <TableCell align="right">Actions</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {
+                        affiliateAccounts.map(
+                            (affiliateAccount, index) =>
+                                <AffiliateAccountRow
+                                    key={index}
+                                    rowIndex={index}
+                                    affiliateAccount={affiliateAccount}
+                                    actions={actions}
+                                />
+                        )
+                    }
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 }

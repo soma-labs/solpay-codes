@@ -3,7 +3,6 @@
 }
 
 .nft-project-item {
-    padding: 1rem;
 }
 
 .nft-project {
@@ -43,14 +42,7 @@
 }
 
 .nft-project--loop {
-    padding: 1rem;
-    //border: 1px solid #a0F;
-    background: #000;
-    height: 100%;
-    transition: all 0.1s ease-out;
-
     &:hover {
-        //box-shadow: 1px 1px 5px #a0f;
     }
 
     .nft-project__image-container {
@@ -81,8 +73,9 @@
 .nft-project--single {
     .nft-project__image-container {
         position: relative;
-        height: 25rem;
         overflow: hidden;
+        height: 100%;
+        min-height: 20rem;
     }
 
     .nft-project__image {
@@ -118,11 +111,6 @@
     width: 3rem;
     height: 3rem;
     object-fit: cover;
-}
-
-.cma-project-form {
-    width: 25rem;
-    max-width: 100%;
 }
 
 .mint-qr-code {

@@ -1,5 +1,6 @@
 import {OrderDirType, OrderDirOptions} from "../program/utils/ordering";
 import {useRouter} from "next/router";
+import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 
 export default function AccountsOrderFilter({columns, defaultOrderBy, defaultOrderDir}: {columns: any, defaultOrderBy?: string, defaultOrderDir?: string}) {
     const router = useRouter();
@@ -33,31 +34,30 @@ export default function AccountsOrderFilter({columns, defaultOrderBy, defaultOrd
     }
 
     return (
-        <div className="d-flex align-items-center">
-            <label className="accounts-filter__order accounts-filter-label form-label m-0 me-2">
-                <strong>Order:</strong>
-            </label>
-            <select
-                name="accounts_filter_order"
-                className="accounts-filter-input form-control"
-                onChange={updateOrder}
+        <FormControl>
+            <InputLabel id="order-select-label">Order</InputLabel>
+            <Select
                 defaultValue={defaultOrderValue}
+                labelId="order-select-label"
+                id="order-select"
+                label="Order"
+                onChange={updateOrder}
+                size="small"
             >
                 {
                     columnValues.map(
                         (columnKey, columnIndex) => orderDirValues.map(
                             (orderKey, orderIndex) =>
-                                <option
+                                <MenuItem
                                     key={`${columnIndex}-${orderIndex}`}
                                     value={getOptionValue(columnKey, orderKey)}
-                                    dangerouslySetInnerHTML={{__html: `${columns[columnKey]} (${OrderDirOptions[orderKey as OrderDirType]})`}}
                                 >
-
-                                </option>
+                                    <span dangerouslySetInnerHTML={{__html: `${columns[columnKey]} (${OrderDirOptions[orderKey as OrderDirType]})`}}/>
+                                </MenuItem>
                         )
                     )
                 }
-            </select>
-        </div>
+            </Select>
+        </FormControl>
     );
 }

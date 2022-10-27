@@ -1,5 +1,5 @@
 import Link from "next/link";
-import AdminLayout from "../../src/components/admin/admin-layout";
+import AdminPage from "../../src/components/admin/admin-page";
 import LoadingIcon from "../../src/components/loading-icon";
 import closeProjectAccount from "../../src/program/project-accounts/close-project-account";
 import {AuthContext} from "../../src/providers/auth-provider";
@@ -12,6 +12,10 @@ import useProjects from "../../src/hooks/useProjects";
 import useQueryParamsPagination from "../../src/hooks/useQueryParamsPagination";
 import SimplePagination from "../../src/components/simple-pagination";
 import {sleep} from "@toruslabs/base-controllers";
+import {Box, Button, Card, CardHeader, Container, Divider, IconButton, Typography} from "@mui/material";
+import PageTitleWrapper from "../../src/tokyo-dashboard/components/PageTitleWrapper";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function Admin() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -44,27 +48,54 @@ export default function Admin() {
     const renderActions = (project: Project) =>
         <>
             <Link href={`/admin/projects/${project.projectAccount.data.project_owner_pubkey.toString()}/${project.projectAccount.data.candy_machine_id.toString()}`}>
-                <a className="button button--hollow">Edit project</a>
+                <a>
+                    <IconButton
+                        aria-label="Edit Project"
+                        size="small"
+                        color="primary"
+                        title="Edit Project"
+                    >
+                        <EditIcon fontSize="small" />
+                    </IconButton>
+                </a>
             </Link>
-            <button
-                className="button button--hollow ms-2"
-                onClick={onCloseProjectAction.bind(null, project)}>
-                Close project
-            </button>
+            <IconButton
+                aria-label="Close Project"
+                color="error"
+                size="small"
+                title="Close Project"
+                onClick={onCloseProjectAction.bind(null, project)}
+            >
+                <DeleteIcon fontSize="small"/>
+            </IconButton>
         </>;
 
     return (
-        <AdminLayout>
-            <section className="nft-projects">
+        <AdminPage>
+            <PageTitleWrapper>
+                <Typography variant="h3" component="h3">
+                    Admin
+                </Typography>
+            </PageTitleWrapper>
+
+            <Container maxWidth="xl" sx={{paddingBottom: 4}}>
                 {projectsLoading ?
                     <LoadingIcon/>
                     :
                     <>
-                        <ProjectsTable projects={projects} actions={renderActions}/>
-                        <SimplePagination pagination={pagination} classVariation={`project-list`}/>
+                        <Card>
+                            <CardHeader title="NFT Projects"/>
+                            <Divider/>
+                            <ProjectsTable projects={projects} actions={renderActions}/>
+                            {pagination.pageCount < 2 ? null :
+                                <Box p={2}>
+                                    <SimplePagination pagination={pagination} classVariation={`projects-list`}/>
+                                </Box>
+                            }
+                        </Card>
                     </>
                 }
-            </section>
-        </AdminLayout>
+            </Container>
+        </AdminPage>
     );
 }

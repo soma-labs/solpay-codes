@@ -4,58 +4,69 @@ import {useContext} from "react";
 import {AuthContext} from "../../src/providers/auth-provider";
 import LoadingIcon from "../../src/components/loading-icon";
 import Image from "next/image";
+import AuthenticatedPage from "../../src/components/authenticated-page";
+import {Box, Container, Grid, List, ListItem, Typography} from "@mui/material";
 
 export default function MyProjectDetails() {
     const router = useRouter();
     const {candyMachine} = router.query;
     const {wallet} = useContext(AuthContext);
-    const {projectLoading, project, affiliateAccounts} = useProject(wallet.publicKey?.toString() as string, candyMachine as string);
+    const {projectLoading, project} = useProject(wallet.publicKey?.toString() as string, candyMachine as string);
 
     return (
-        <>
-            {!wallet.connected ? <h3>You must be logged in to view your projects.</h3> :
-                projectLoading ? <LoadingIcon/>: !project ? null :
-                    <section className="nft-project nft-project--single">
-                        <div className="d-flex flex-wrap mb-3">
-                            <div className="col-12 col-md-3">
-                                <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
-                                    {project.projectData?.image_url &&
-                                        <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
-                                    }
-                                </div>
-                            </div>
-                            <div className="col ps-md-4">
-                                <header className="nft-project__header mb-5">
-                                    <h1 className="nft-project__title">
-                                        {project.projectAccount.data.title || `Candy Machine: ${candyMachine}`}
-                                    </h1>
-                                    <div className="nft-project__description">
-                                        {project.projectData?.description}
-                                    </div>
-                                </header>
+        <AuthenticatedPage>
+            <Container maxWidth="xl" sx={{p: 3}} className="nft-project nft-project--single">
+                {projectLoading ? <LoadingIcon/>: !project ? null :
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={3}>
+                            <Box className="nft-project__image-container">
+                                {project.projectData?.image_url &&
+                                    <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
+                                }
+                            </Box>
+                        </Grid>
 
-                                <div className="mb-5">
-                                    <section className="nft-project__details">
-                                        <h4>Details:</h4>
-                                        <ul>
-                                            <li>Affiliate fee (%): {project.projectAccount.data.affiliate_fee_percentage}</li>
-                                            <li>Affiliate target (SOL): {project.projectAccount.data.affiliate_target_in_sol}</li>
-                                        </ul>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
+                        <Grid item xs>
+                            <Box component="header" className="nft-project__header" mb={3}>
+                                <Typography variant="h1" className="nft-project__title" mb={2}>
+                                    {project.getTitle()}
+                                </Typography>
 
-                        {affiliateAccounts.length > 0 ? <section className="nft-project__affiliates">
-                            <h4>Nb of affiliates: {affiliateAccounts.length}</h4>
-                            <ul>
-                                {affiliateAccounts.map((affiliateAccount, index) => <li key={index}>
-                                    <span className="pubkey">{affiliateAccount.data.affiliate_pubkey.toString()}</span>
-                                </li>)}
-                            </ul>
-                        </section> : null}
-                    </section>
-            }
-        </>
+                                <Typography component="p" className="nft-project__description">
+                                    {project.projectData?.description}
+                                </Typography>
+                            </Box>
+
+                            <Box component="section" className="nft-project__details">
+                                <Typography component="h3" variant="h3" className="nft-project__title" mb={2}>
+                                    Details
+                                </Typography>
+
+                                <List dense disablePadding className="bullet-list">
+                                    <ListItem disableGutters>
+                                        <strong>Created at:</strong>&nbsp;{project.projectAccount.createdAt()}
+                                    </ListItem>
+                                    <ListItem disableGutters>
+                                        <strong>Updated at:</strong>&nbsp;{project.projectAccount.updatedAt()}
+                                    </ListItem>
+                                    <ListItem disableGutters>
+                                        <strong>Affiliate fee:</strong>&nbsp;{project.projectAccount.data.affiliate_fee_percentage}%
+                                    </ListItem>
+                                    <ListItem disableGutters>
+                                        <strong>Affiliate target:</strong>&nbsp;{project.projectAccount.data.affiliate_target_in_sol}◎
+                                    </ListItem>
+                                    <ListItem disableGutters>
+                                        <strong>Max affiliate count:</strong>&nbsp;{project.projectAccount.data.max_affiliate_count}
+                                    </ListItem>
+                                    <ListItem disableGutters>
+                                        <strong>Affiliate count:</strong>&nbsp;{project.projectAccount.data.affiliate_count}
+                                    </ListItem>
+                                </List>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                }
+            </Container>
+        </AuthenticatedPage>
     );
 }

@@ -115,7 +115,7 @@ export default function ProjectMint() {
                         </div>
                         <header className="nft-project__header mb-5">
                             <h1 className="nft-project__title">
-                                {project.projectAccount.data.title || `Candy Machine: ${candyMachine}`}
+                                {project.getTitle()}
                             </h1>
                             <div className="nft-project__description">
                                 {project.projectData?.description}

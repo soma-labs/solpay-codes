@@ -9,6 +9,10 @@ import {WalletPendingProjectsContext} from "../../src/providers/wallet-pending-p
 import {WalletProjectsContext} from "../../src/providers/wallet-projects-provider";
 import {sleep} from "@toruslabs/base-controllers";
 import Image from "next/image";
+import {Box, Container, FormControl, Grid, InputAdornment, TextField, Typography} from "@mui/material";
+import AuthenticatedPage from "../../src/components/authenticated-page";
+import {Stack} from "@mui/system";
+import {LoadingButton} from "@mui/lab";
 
 export default function MyPendingProject() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -17,11 +21,16 @@ export default function MyPendingProject() {
     const router = useRouter();
     const {candyMachine} = router.query;
     const [pendingProject, setPendingProject] = useState<ProjectData|null>(null);
+    const [isRegistering, setIsRegistering] = useState<boolean>(false);
     const {refreshWalletProjects} = useContext(WalletProjectsContext);
     const {pendingProjects, refreshPendingProjects} = useContext(WalletPendingProjectsContext);
 
-    const onProjectRegistrationFormSubmit = async (e: any) => {
-        e.preventDefault();
+    const onProjectRegistrationFormSubmit = async () => {
+        if (isRegistering) {
+            return;
+        }
+
+        setIsRegistering(true);
 
         try {
             const formData = new FormData(formRef.current as HTMLFormElement);
@@ -39,6 +48,8 @@ export default function MyPendingProject() {
             refreshWalletProjects();
             refreshPendingProjects();
 
+            setIsRegistering(false);
+
             router.push(`/`);
         } catch (e) {
             if (e instanceof Error) {
@@ -46,6 +57,8 @@ export default function MyPendingProject() {
             } else {
                 console.log(e);
             }
+
+            setIsRegistering(false);
         }
     };
 
@@ -64,90 +77,92 @@ export default function MyPendingProject() {
     }, [wallet.connected, candyMachine, pendingProjects]);
 
     return (
-        <>
+        <AuthenticatedPage>
             {!pendingProject ? null :
-                <section className="nft-project nft-project--single">
-                    <div className="d-flex flex-wrap">
-                        <div className="col-12 col-md-3">
-                            <div className="nft-project__image-container d-flex justify-content-center align-items-center mb-3">
+                <Container maxWidth="xl" sx={{p: 3}} className="nft-project nft-project--single">
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={3}>
+                            <Box className="nft-project__image-container">
                                 {pendingProject.image_url &&
                                     <Image src={pendingProject.image_url} className="nft-project__image" alt="" layout="fill"/>
                                 }
-                            </div>
-                        </div>
-                        <div className="col ps-md-4">
-                            <header className="nft-project__header mb-5">
-                                <h1 className="nft-project__title">
-                                    {pendingProject.title || `Candy Machine: ${candyMachine}`}
-                                </h1>
-                                <div className="nft-project__description">
-                                    {pendingProject.description}
-                                </div>
-                            </header>
+                            </Box>
+                        </Grid>
 
-                            <form ref={formRef} className="cma-project-form form" onSubmit={onProjectRegistrationFormSubmit}>
-                                <input type="hidden" name="candy_machine_id" value={pendingProject.candy_machine_id.toString()}/>
-                                <p>
-                                    <label className="form-label w-100">
-                                        <span className="d-inline-block mb-1">Affiliate fee percentage</span>
-                                        <input
-                                            type="number"
+                        <Grid item xs>
+                            <Box component="header" className="nft-project__header" mb={3}>
+                                <Typography variant="h1" className="nft-project__title" mb={2}>
+                                    {pendingProject.title}
+                                </Typography>
+
+                                <Typography component="p" className="nft-project__description">
+                                    {pendingProject.description}
+                                </Typography>
+                            </Box>
+
+                            <Container maxWidth="sm" sx={{m: 0}}>
+                                <Stack spacing={2} component="form" ref={formRef} onSubmit={onProjectRegistrationFormSubmit}>
+                                    <input type="hidden" name="candy_machine_id" value={pendingProject.candy_machine_id.toString()}/>
+                                    <FormControl>
+                                        <TextField
                                             name="affiliate_fee_percentage"
-                                            min={0}
-                                            max={100}
-                                            step={0.01}
-                                            className="form-control w-100"
+                                            label={`Affiliate fee percentage`}
+                                            inputProps={{ inputMode: 'numeric', pattern: '^[1-9][0-9]?$|^100$' }}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">%</InputAdornment>
+                                            }}
                                             required
                                         />
-                                    </label>
-                                </p>
-                                <p>
-                                    <label className="form-label w-100">
-                                        <span className="d-inline-block mb-1">Affiliate target in SOL</span>
-                                        <input
-                                            type="number"
+                                    </FormControl>
+                                    <FormControl>
+                                        <TextField
                                             name="affiliate_target_in_sol"
-                                            min={0}
-                                            step={0.01}
-                                            className="form-control w-100"
+                                            label={`Affiliate target in SOL`}
+                                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">◎</InputAdornment>
+                                            }}
                                             required
                                         />
-                                    </label>
-                                </p>
-                                <p>
-                                    <label className="form-label w-100">
-                                        <span className="d-inline-block mb-1">Max affiliate count</span>
-                                        <input
-                                            type="number"
+                                    </FormControl>
+                                    <FormControl>
+                                        <TextField
                                             name="max_affiliate_count"
-                                            min={1}
-                                            max={255}
+                                            label={`Max affiliate count`}
+                                            inputProps={{ inputMode: 'numeric', pattern: '\\b(1?0|[1-9][0-9]{0,1}|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\b' }}
                                             defaultValue={255}
-                                            className="form-control w-100"
                                             required
                                         />
-                                    </label>
-                                </p>
-                                <p>
-                                    <label className="form-label w-100">
-                                        <span className="d-inline-block mb-1">Title</span>
-                                        <input
-                                            type="text"
+                                    </FormControl>
+                                    <FormControl>
+                                        <TextField
                                             name="title"
+                                            label={`Title`}
                                             defaultValue={pendingProject.title}
-                                            className="form-control w-100"
                                             required
                                         />
-                                    </label>
-                                </p>
-                                <p>
-                                    <button className="button button--hollow">Finish registration</button>
-                                </p>
-                            </form>
-                        </div>
-                    </div>
-                </section>
+                                    </FormControl>
+                                    <FormControl>
+                                        <LoadingButton
+                                            loading={isRegistering}
+                                            variant="contained"
+                                            onClick={() => {
+                                                if (formRef.current) {
+                                                    if (formRef.current.reportValidity()) {
+                                                        onProjectRegistrationFormSubmit();
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            Finish registration
+                                        </LoadingButton>
+                                    </FormControl>
+                                </Stack>
+                            </Container>
+                        </Grid>
+                    </Grid>
+                </Container>
             }
-        </>
+        </AuthenticatedPage>
     );
 }

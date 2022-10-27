@@ -1,5 +1,6 @@
 import {PaginationType} from "../program/utils/pagination";
 import Link from "next/link";
+import { Box, Button } from "@mui/material";
 
 export default function SimplePagination({pagination, classVariation}: {pagination: PaginationType, classVariation?: string}) {
     const getPaginationLink = (page: number | null, text: string, classVariation?: string) => {
@@ -13,7 +14,9 @@ export default function SimplePagination({pagination, classVariation}: {paginati
         return (
             <Link href={`${window.location.pathname}?${queryParams.toString()}`}>
                 <a className={`pagination__link ${classVariation ? `pagination__link--${classVariation}` : ''} link`}>
-                    {text}
+                    <Button size="small">
+                        {text}
+                    </Button>
                 </a>
             </Link>
         );
@@ -22,11 +25,11 @@ export default function SimplePagination({pagination, classVariation}: {paginati
     return (
         <>
             {pagination.pageCount && pagination.pageCount <= 1 ? null :
-                <div className={`pagination ${classVariation ? `pagination--${classVariation}` : ''} d-flex justify-content-center`}>
+                <Box className={`pagination ${classVariation ? `pagination--${classVariation}` : ''}`} display="flex" justifyContent="center">
                     {getPaginationLink(pagination.prevPage, `Prev`, 'prev-page')}
-                    <span className="mx-2">{pagination.currentPage}</span>
+                    <Button size="small">{pagination.currentPage}</Button>
                     {getPaginationLink(pagination.nextPage, `Next`, 'next-page')}
-                </div>
+                </Box>
             }
         </>
     );
