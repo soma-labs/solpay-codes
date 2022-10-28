@@ -103,7 +103,7 @@ export default class AffiliateAccount {
     }
 
     getProjectLink(): string {
-        return `${process.env.NEXT_PUBLIC_VERCEL_URL}/projects/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}`;
+        return `${process.env.NEXT_PUBLIC_VERCEL_ENV ? 'https://' : ''}${process.env.NEXT_PUBLIC_VERCEL_URL}/projects/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}`;
     }
 
     getProjectMintLink(): string {
