@@ -11,11 +11,13 @@ import {
 import AccountsOrderFilter from "../src/components/accounts-order-filter";
 import AccountsSearchFilter from "../src/components/accounts-search-filter";
 import useQueryParamsSearch from "../src/hooks/useQueryParamsSearch";
-import {Box, Container, Grid} from "@mui/material";
+import {Box, Container, Divider, Grid, useMediaQuery, useTheme} from "@mui/material";
 import PageTitleWrapper from "../src/tokyo-dashboard/components/PageTitleWrapper";
 import LoadingIcon from "../src/components/loading-icon";
 
 export default function Home() {
+    const theme = useTheme();
+    const isMediumDevice = useMediaQuery(theme.breakpoints.up('md'));
     const queryParamsPagination = useQueryParamsPagination();
     const queryParamsOrdering = useQueryParamsOrdering();
     const queryParamsSearch = useQueryParamsSearch();
@@ -33,8 +35,15 @@ export default function Home() {
     return (
         <>
             <PageTitleWrapper>
-                <Box className="accounts-filter accounts-filter--projects" display="flex" justifyContent="space-between">
+                <Box
+                    className="accounts-filter
+                    accounts-filter--projects"
+                    display="flex"
+                    flexDirection={isMediumDevice ? `row` : `column`}
+                    justifyContent="space-between"
+                >
                     <AccountsSearchFilter label="Search by title" defaultSearch={queryParamsSearch}/>
+                    {!isMediumDevice && <Divider sx={{my: 2}}/>}
                     <AccountsOrderFilter
                         columns={ProjectOrderColumnsOptions}
                         defaultOrderBy={queryParamsOrdering?.orderBy}
@@ -54,7 +63,7 @@ export default function Home() {
                         >
                             {
                                 projects.map((project, index) =>
-                                    <Grid key={index} item xs={3}>
+                                    <Grid key={index} item xs={12} md={3}>
                                         <Link href={project.getLink()}>
                                             <a>
                                                 <ProjectCard
