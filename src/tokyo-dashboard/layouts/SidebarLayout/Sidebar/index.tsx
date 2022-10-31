@@ -3,7 +3,7 @@ import Scrollbar from '../../../components/Scrollbar';
 import {SidebarContext} from '../../../contexts/SidebarContext';
 
 import {
-    Box, Drawer, alpha, styled, Divider, useTheme, lighten, darken
+    Box, Drawer, alpha, styled, Divider, useTheme, lighten, darken, Button
 } from '@mui/material';
 
 import SidebarMenu from './SidebarMenu';

@@ -59,11 +59,18 @@ function Header() {
                     </Link>
                 </Box>
                 <Box sx={{marginLeft: 'auto'}} display="flex" alignItems="center">
-                    <Link href="/projects/new">
-                        <a>
-                            <Button variant="contained" size="small" sx={{marginRight: 1}}>Register Project</Button>
-                        </a>
-                    </Link>
+                    <Box
+                        component="span"
+                        sx={{
+                            display: {lg: 'inline-block', xs: 'none'}
+                        }}
+                    >
+                        <Link href="/projects/new">
+                            <a>
+                                <Button variant="contained" size="small" sx={{marginRight: 1}}>Register Project</Button>
+                            </a>
+                        </Link>
+                    </Box>
 
                     <HeaderUserBox/>
 
@@ -75,7 +82,7 @@ function Header() {
                     >
                         <Tooltip arrow title="Toggle Menu">
                             <IconButton color="primary" onClick={toggleSidebar} sx={{ml: 1}}>
-                                {!sidebarToggle ? (<MenuTwoToneIcon fontSize="medium"/>) : (<CloseTwoToneIcon fontSize="medium"/>)}
+                                {!sidebarToggle ? (<MenuTwoToneIcon fontSize="large"/>) : (<CloseTwoToneIcon fontSize="large"/>)}
                             </IconButton>
                         </Tooltip>
                     </Box>

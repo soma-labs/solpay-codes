@@ -7,6 +7,7 @@ import AppsTwoTone from '@mui/icons-material/AppsTwoTone';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PendingActionsTwoToneIcon from '@mui/icons-material/PendingActionsTwoTone';
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import {useContext} from "react";
 import {AuthContext} from "../../../../../providers/auth-provider";
 import {WalletProjectsContext} from "../../../../../providers/wallet-projects-provider";
@@ -204,6 +205,19 @@ function SidebarMenu() {
                                             startIcon={<AppsTwoTone/>}
                                         >
                                             Projects
+                                        </Button>
+                                    </a>
+                                </Link>
+                            </ListItem>
+
+                            <ListItem sx={{width: '100%', display: {lg: 'none', xs: 'flex'}}} selected={router.asPath === `/projects/new`}>
+                                <Link href={`/projects/new`}>
+                                    <a>
+                                        <Button
+                                            disableRipple
+                                            startIcon={<AppRegistrationIcon/>}
+                                        >
+                                            Register Project
                                         </Button>
                                     </a>
                                 </Link>
