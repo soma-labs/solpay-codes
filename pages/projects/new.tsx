@@ -1,7 +1,7 @@
 import {useContext, useRef, useState} from "react";
 import Script from "next/script";
 import {PopupMessageContext, PopupMessageTypes} from "../../src/providers/popup-message-provider";
-import {Container, FormControl, TextField, Typography} from "@mui/material";
+import {Card, Container, FormControl, TextField, Typography} from "@mui/material";
 import PageTitleWrapper from "../../src/tokyo-dashboard/components/PageTitleWrapper";
 import {Stack} from "@mui/system";
 import {LoadingButton} from "@mui/lab";
@@ -78,51 +78,53 @@ export default function Projects() {
                 </Typography>
             </PageTitleWrapper>
 
-            <Container maxWidth="xs" sx={{p: 3}}>
+            <Container maxWidth="xs">
                 <Script src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}/>
-
-                <Stack spacing={2} component="form" ref={formRef} onSubmit={onProjectRegistrationFormSubmit}>
-                    <FormControl>
-                        <TextField
-                            name="title"
-                            label={`Project title`}
-                            required
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <TextField
-                            name="description"
-                            label={`Project description`}
-                            required
-                            multiline
-                            inputProps={{maxLength: 255}}
-                            helperText="Max 255 characters"
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <TextField
-                            name="contact"
-                            label={`Owner contact`}
-                            required
-                            helperText="Discord / Twitter / E-mail"
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <LoadingButton
-                            loading={isRegistering}
-                            variant="contained"
-                            onClick={() => {
-                                if (formRef.current) {
-                                    if (formRef.current.reportValidity()) {
-                                        onProjectRegistrationFormSubmit();
+                <Card sx={{p: 3}}>
+                    <Stack spacing={2} component="form" ref={formRef} onSubmit={onProjectRegistrationFormSubmit}>
+                        <FormControl>
+                            <TextField
+                                name="title"
+                                label={`Project title`}
+                                required
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <TextField
+                                name="description"
+                                label={`Project description`}
+                                required
+                                multiline
+                                inputProps={{maxLength: 255}}
+                                rows={7}
+                                helperText="Max 255 characters"
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <TextField
+                                name="contact"
+                                label={`Owner contact`}
+                                required
+                                helperText="Discord / Twitter / E-mail"
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <LoadingButton
+                                loading={isRegistering}
+                                variant="contained"
+                                onClick={() => {
+                                    if (formRef.current) {
+                                        if (formRef.current.reportValidity()) {
+                                            onProjectRegistrationFormSubmit();
+                                        }
                                     }
-                                }
-                            }}
-                        >
-                            Request Registration
-                        </LoadingButton>
-                    </FormControl>
-                </Stack>
+                                }}
+                            >
+                                Request Registration
+                            </LoadingButton>
+                        </FormControl>
+                    </Stack>
+                </Card>
             </Container>
         </>
     );

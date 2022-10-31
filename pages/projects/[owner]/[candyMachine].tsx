@@ -103,17 +103,9 @@ export default function ProjectDetails() {
                                 </ListItem>
                                 <ListItem disableGutters>
                                     <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
-                                        <strong>Max Affiliate Count:</strong>
+                                        <strong>Affiliates:</strong>
                                         <span>
-                                            {project.projectAccount.data.max_affiliate_count}
-                                        </span>
-                                    </Box>
-                                </ListItem>
-                                <ListItem disableGutters>
-                                    <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
-                                        <strong>Affiliate Count:</strong>
-                                        <span>
-                                            {project.projectAccount.data.affiliate_count}
+                                            {project.projectAccount.data.affiliate_count}/{project.projectAccount.data.max_affiliate_count}
                                         </span>
                                     </Box>
                                 </ListItem>

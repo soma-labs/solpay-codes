@@ -8,11 +8,12 @@ import Image from "next/image";
 import {LAMPORTS_PER_SOL, Transaction} from "@solana/web3.js";
 import {PopupMessageContext, PopupMessageTypes} from "../../../src/providers/popup-message-provider";
 import getSolscanLink from "../../../src/utils/solscan-link";
-import {Box, CircularProgress, Container, Grid, List, ListItem, Typography} from "@mui/material";
+import {Box, Button, CircularProgress, Container, Grid, List, ListItem, Typography} from "@mui/material";
 import {LoadingButton} from "@mui/lab";
 import useCandyMachineAccount from "../../../src/hooks/useCandyMachineAccount";
 import {SolTokenIcon} from "../../../src/program/constants";
 import getDiscountedNftPrice from "../../../src/program/utils/discount-price-calculator";
+import {CandyMachineAccount} from "../../../src/candy-machine/candy-machine";
 
 export default function ProjectMint() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -88,6 +89,28 @@ export default function ProjectMint() {
         setIsMinting(false);
     };
 
+    const isLive = (candyMachineAccount: CandyMachineAccount | null): boolean => {
+        if (!candyMachineAccount) {
+            return false;
+        }
+
+        return candyMachineAccount.state.goLiveDate.muln(1000).toNumber() <= (new Date()).getTime();
+    };
+
+    const getGoLiveDate = (candyMachineAccount: CandyMachineAccount | null, withTime: boolean = false): string => {
+        if (!candyMachineAccount) {
+            return '';
+        }
+
+        const date = (new Date(candyMachineAccount.state.goLiveDate.muln(1000).toNumber())).toISOString();
+
+        if (withTime) {
+            return date;
+        }
+
+        return (new Date(candyMachineAccount.state.goLiveDate.muln(1000).toNumber())).toISOString().split('T')[0];
+    };
+
     useEffect(() => {
         if (!owner || !candyMachine) {
             return;
@@ -135,7 +158,12 @@ export default function ProjectMint() {
                                 <Image src={qrImageData} width={512} height={512} alt=""/>
                             </Box>
                         }
-                        {wallet.connected &&
+                        {!isLive(candyMachineAccount) &&
+                            <Button fullWidth variant="contained" color="secondary" size="large">
+                                Minting starts on {getGoLiveDate(candyMachineAccount, true)}
+                            </Button>
+                        }
+                        {wallet.connected && isLive(candyMachineAccount) &&
                             <LoadingButton
                                 fullWidth
                                 loading={isMinting}
@@ -164,7 +192,7 @@ export default function ProjectMint() {
                                         <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
                                             <strong>Go Live Date:</strong>
                                             <span>
-                                                {(new Date(candyMachineAccount.state.goLiveDate.muln(1000).toNumber())).toISOString().split('T')[0]}
+                                                {getGoLiveDate(candyMachineAccount)}
                                             </span>
                                         </Box>
                                     </ListItem>
