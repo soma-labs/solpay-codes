@@ -46,11 +46,18 @@ function Header() {
                 justifyContent="space-between"
                 width="100%"
             >
-                <Link href="/">
-                    <a>
-                        <Image src={`/images/solpay-codes-logo-mobile.jpg`} alt="solpay.codes logo" width={50} height={50}/>
-                    </a>
-                </Link>
+                <Box
+                    component="span"
+                    sx={{
+                        display: {lg: 'none', xs: 'flex'}
+                    }}
+                >
+                    <Link href="/">
+                        <a>
+                            <Image src={`/images/solpay-codes-logo-mobile.jpg`} alt="solpay.codes logo" width={50} height={50}/>
+                        </a>
+                    </Link>
+                </Box>
                 <Box sx={{marginLeft: 'auto'}} display="flex" alignItems="center">
                     <Link href="/projects/new">
                         <a>
