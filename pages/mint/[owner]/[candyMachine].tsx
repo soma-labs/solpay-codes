@@ -158,27 +158,38 @@ export default function ProjectMint() {
                                 <Image src={qrImageData} width={512} height={512} alt=""/>
                             </Box>
                         }
-                        {!isLive(candyMachineAccount) &&
-                            <Button fullWidth variant="contained" color="secondary" size="large">
-                                Minting starts on {getGoLiveDate(candyMachineAccount, true)}
-                            </Button>
+                        {!wallet.connected ?
+                            <Typography variant="h4">You have to login in order to mint</Typography>
+                            :
+                            (
+                                !isLive(candyMachineAccount) ?
+                                    <Button fullWidth variant="contained" color="secondary" size="large">
+                                        Minting starts on {getGoLiveDate(candyMachineAccount, true)}
+                                    </Button>
+                                    :
+                                    <LoadingButton
+                                        fullWidth
+                                        loading={isMinting}
+                                        variant="contained"
+                                        color="success"
+                                        size="large"
+                                        onClick={onMintClick}>
+                                        {isMinting ? 'MINTING...' : 'MINT'}
+                                    </LoadingButton>
+                            )
                         }
-                        {wallet.connected && isLive(candyMachineAccount) &&
-                            <LoadingButton
-                                fullWidth
-                                loading={isMinting}
-                                variant="contained"
-                                color="success"
-                                size="large"
-                                onClick={onMintClick}>
-                                {isMinting ? 'MINTING...' : 'MINT'}
-                            </LoadingButton>
-                        }
-                        <Box component="section" className="candy-machine-details" mt={3} sx={{width: '100%'}}>
+                        <Box
+                            component="section"
+                            className="candy-machine-details"
+                            display="flex"
+                            justifyContent="center"
+                            mt={3}
+                            sx={{width: '100%'}}
+                        >
                             {!candyMachineAccount ?
                                 <CircularProgress size="2rem"/>
                                 :
-                                <List dense disablePadding>
+                                <List dense disablePadding sx={{width: '100%'}}>
                                     <ListItem disableGutters>
                                         <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
                                             <strong>Total Minted:</strong>
