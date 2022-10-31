@@ -9,6 +9,7 @@ import CloseTwoToneIcon from '@mui/icons-material/CloseTwoTone';
 
 import HeaderUserBox from './UserBox';
 import Link from "next/link";
+import Image from "next/image";
 
 const HeaderWrapper = styled(Box)(({theme}) => `
         height: ${theme.header.height};
@@ -45,25 +46,32 @@ function Header() {
                 justifyContent="space-between"
                 width="100%"
             >
-                <Box
-                    component="span"
-                    sx={{
-                        ml: 2, display: {lg: 'none', xs: 'inline-block'}
-                    }}
-                >
-                    <Tooltip arrow title="Toggle Menu">
-                        <IconButton color="primary" onClick={toggleSidebar}>
-                            {!sidebarToggle ? (<MenuTwoToneIcon fontSize="small"/>) : (<CloseTwoToneIcon fontSize="small"/>)}
-                        </IconButton>
-                    </Tooltip>
-                </Box>
-                <Box sx={{marginLeft: 'auto'}}>
+                <Link href="/">
+                    <a>
+                        <Image src={`/images/solpay-codes-logo-mobile.jpg`} alt="solpay.codes logo" width={50} height={50}/>
+                    </a>
+                </Link>
+                <Box sx={{marginLeft: 'auto'}} display="flex" alignItems="center">
                     <Link href="/projects/new">
                         <a>
-                            <Button variant="contained" size="small" sx={{marginRight: '1rem'}}>Register Project</Button>
+                            <Button variant="contained" size="small" sx={{marginRight: 1}}>Register Project</Button>
                         </a>
                     </Link>
+
                     <HeaderUserBox/>
+
+                    <Box
+                        component="span"
+                        sx={{
+                            display: {lg: 'none', xs: 'flex'}
+                        }}
+                    >
+                        <Tooltip arrow title="Toggle Menu">
+                            <IconButton color="primary" onClick={toggleSidebar} sx={{ml: 1}}>
+                                {!sidebarToggle ? (<MenuTwoToneIcon fontSize="medium"/>) : (<CloseTwoToneIcon fontSize="medium"/>)}
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
                 </Box>
             </Box>
         </HeaderWrapper>

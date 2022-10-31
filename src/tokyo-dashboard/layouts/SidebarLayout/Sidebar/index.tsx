@@ -75,11 +75,6 @@ function Sidebar() {
                     }}
                 >
                     <Scrollbar>
-                        <Divider
-                            sx={{
-                                mt: theme.spacing(3), mx: theme.spacing(2), background: theme.colors.alpha.trueWhite[10]
-                            }}
-                        />
                         <SidebarMenu/>
                     </Scrollbar>
                 </SidebarWrapper>

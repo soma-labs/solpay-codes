@@ -34,7 +34,7 @@ export default function AccountsSearchFilter({label, defaultSearch}: {label: str
     }, [defaultSearch]);
 
     return (
-        <Box component="form" onSubmit={onSearch} display="flex" alignItems="center">
+        <Box component="form" onSubmit={onSearch} display="flex" alignItems="center" justifyContent="space-between">
             <TextField
                 inputRef={inputRef}
                 label={label}
