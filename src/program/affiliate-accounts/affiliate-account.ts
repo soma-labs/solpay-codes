@@ -5,6 +5,7 @@ import getProjectAccount from "../project-accounts/get-project-account";
 import Project from '../../models/project/project';
 import getProjectData from "../../models/project/get-project-data";
 import BN from "bn.js";
+import getUrlWithBase from "../../utils/base-url";
 
 export const AffiliateAccountDiscriminator = 'affiliate_account';
 const AffiliateAccountRentInSol = 0.00180264;
@@ -103,11 +104,11 @@ export default class AffiliateAccount {
     }
 
     getProjectLink(): string {
-        return `${process.env.NEXT_PUBLIC_VERCEL_ENV ? 'https://' : ''}${process.env.NEXT_PUBLIC_VERCEL_URL}/projects/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}`;
+        return getUrlWithBase(`/projects/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}`);
     }
 
     getProjectMintLink(): string {
-        return `${process.env.NEXT_PUBLIC_VERCEL_URL}/mint/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}?affiliate=${this.data.affiliate_pubkey.toString()}`;
+        return getUrlWithBase(`/mint/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}?affiliate=${this.data.affiliate_pubkey.toString()}`);
     }
 
     mintCount(whiteListNftPrice: BN | null): number {

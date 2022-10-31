@@ -1,5 +1,6 @@
 import ProjectAccount from "../../program/project-accounts/project-account";
 import ProjectData from "./project-data";
+import getUrlWithBase from "../../utils/base-url";
 
 export default class Project {
     projectAccount: ProjectAccount;
@@ -15,10 +16,10 @@ export default class Project {
     }
 
     getLink(): string {
-        return `${process.env.NEXT_PUBLIC_VERCEL_ENV ? 'https://' : ''}${process.env.NEXT_PUBLIC_VERCEL_URL}/projects/${this.projectAccount.data.project_owner_pubkey.toString()}/${this.projectAccount.data.candy_machine_id.toString()}`;
+        return getUrlWithBase(`/projects/${this.projectAccount.data.project_owner_pubkey.toString()}/${this.projectAccount.data.candy_machine_id.toString()}`);
     }
 
     getMintLink(): string {
-        return `${process.env.NEXT_PUBLIC_VERCEL_ENV ? 'https://' : ''}${process.env.NEXT_PUBLIC_VERCEL_URL}/mint/${this.projectAccount.data.project_owner_pubkey.toString()}/${this.projectAccount.data.candy_machine_id.toString()}`;
+        return getUrlWithBase(`/mint/${this.projectAccount.data.project_owner_pubkey.toString()}/${this.projectAccount.data.candy_machine_id.toString()}`);
     }
 }
