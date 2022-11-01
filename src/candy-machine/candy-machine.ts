@@ -149,31 +149,31 @@ export const getCandyMachineAccount = async (
             }
 
             // retrieves the whitelist token
-            const mint = new anchor.web3.PublicKey(
-                cndy.state.whitelistMintSettings.mint,
-            );
-            const token = (
-                await getAtaForMint(mint, walletPublicKey)
-            )[0];
-
-            try {
-                const balance = await connection.getTokenAccountBalance(token);
-                isWLUser = parseInt(balance.value.amount) > 0;
-                // only whitelist the user if the balance > 0
-
-                if (cndy.state.isWhitelistOnly) {
-                    active = isWLUser && (presale || active);
-                }
-            } catch (e) {
-                // no whitelist user, no mint
-                if (cndy.state.isWhitelistOnly) {
-                    active = false;
-                }
-                console.log(
-                    'There was a problem fetching whitelist token balance',
-                );
-                console.log(e);
-            }
+            // const mint = new anchor.web3.PublicKey(
+            //     cndy.state.whitelistMintSettings.mint,
+            // );
+            // const token = (
+            //     await getAtaForMint(mint, walletPublicKey)
+            // )[0];
+            //
+            // try {
+            //     const balance = await connection.getTokenAccountBalance(token);
+            //     isWLUser = parseInt(balance.value.amount) > 0;
+            //     // only whitelist the user if the balance > 0
+            //
+            //     if (cndy.state.isWhitelistOnly) {
+            //         active = isWLUser && (presale || active);
+            //     }
+            // } catch (e) {
+            //     // no whitelist user, no mint
+            //     if (cndy.state.isWhitelistOnly) {
+            //         active = false;
+            //     }
+            //     console.log(
+            //         'There was a problem fetching whitelist token balance',
+            //     );
+            //     console.log(e);
+            // }
         }
 
         userPrice = isWLUser ? userPrice : cndy.state.price;

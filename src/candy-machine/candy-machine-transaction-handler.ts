@@ -7,7 +7,11 @@ import * as Web3 from "@solana/web3.js";
 import * as anchor from '@project-serum/anchor';
 import {getCandyMachineAccount, mintOneToken} from "./candy-machine";
 import getAffiliateAccountAddress from "../program/affiliate-accounts/get-affiliate-account-address";
-import {createMintToCheckedInstruction, getAssociatedTokenAddress} from "@solana/spl-token";
+import {
+    createAssociatedTokenAccountInstruction,
+    createMintToCheckedInstruction, createMintToInstruction,
+    getAssociatedTokenAddress
+} from "@solana/spl-token";
 
 const SOLPAY_TREASURY = process.env.NEXT_PUBLIC_SOLPAY_TREASURY as string;
 const SOLPAY_FEE_NORMAL_MINT_PERCENTAGE = parseFloat(process.env.NEXT_PUBLIC_SOLPAY_FEE_NORMAL_MINT_PERCENTAGE as string);
@@ -87,18 +91,27 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
 
             let walletWhitelistAta = await getAssociatedTokenAddress(
                 WHITELIST_TOKEN_MINT,
-                walletPublicKey, // fee payer
+                walletPublicKey,
             );
 
-            const whitelistTokenTransferInstruction = await createMintToCheckedInstruction(
+            const whitelistTokenTransferInstruction = await createMintToInstruction(
                 WHITELIST_TOKEN_MINT, // mint
                 walletWhitelistAta, // receiver (should be a token account)
                 WHITELIST_AUTHORITY_KEYPAIR.publicKey, // mint authority
                 1, // amount. if your decimals is 8, you mint 10^8 for 1 token.
-                9 // decimals
+                //9 // decimals
             );
 
             instructions.unshift(whitelistTokenTransferInstruction);
+
+            const createWhitelistAtaInstruction = createAssociatedTokenAccountInstruction(
+                walletPublicKey, // payer
+                walletWhitelistAta, // ata
+                walletPublicKey, // owner
+                WHITELIST_TOKEN_MINT // mint
+            );
+
+            instructions.unshift(createWhitelistAtaInstruction);
 
             const affiliateWalletFeeInstruction = SystemProgram.transfer({
                 fromPubkey: walletPublicKey,

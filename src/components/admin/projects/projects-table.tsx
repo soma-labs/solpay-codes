@@ -23,7 +23,7 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                         projects.map((project, index) =>
                             <TableRow key={index}>
                                 <TableCell>
-                                    <Link href={project.getTitle()}>
+                                    <Link href={project.getLink()}>
                                         <a>
                                             <Box sx={{width: 50, height: 50, position: 'relative'}}>
                                                 <Image src={project.projectData?.image_url as string} className="projects-table__image" alt="NFT project image" width="50" height="50"/>
@@ -32,7 +32,7 @@ export default function ProjectsTable({projects, actions}: {projects: Project[],
                                     </Link>
                                 </TableCell>
                                 <TableCell>
-                                    <Link href={project.getTitle()}>
+                                    <Link href={project.getLink()}>
                                         <a>
                                             <Typography>
                                                 <MuiLink component="span">
