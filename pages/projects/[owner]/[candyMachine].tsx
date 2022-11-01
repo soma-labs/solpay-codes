@@ -2,7 +2,7 @@ import {useRouter} from "next/router";
 import {PublicKey} from "@solana/web3.js";
 import registerAffiliateAccount from "../../../src/program/affiliate-accounts/register-affiliate-account";
 import useProject from "../../../src/hooks/useProject";
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {AuthContext} from "../../../src/providers/auth-provider";
 import {PopupMessageContext, PopupMessageTypes} from "../../../src/providers/popup-message-provider";
 import LoadingIcon from "../../../src/components/loading-icon";
@@ -18,20 +18,12 @@ export default function ProjectDetails() {
     const router = useRouter();
     const {owner, candyMachine} = router.query;
     const {setMessage} = useContext(PopupMessageContext);
-    const {wallet, connection} = useContext(AuthContext);
+    const {wallet, connection, showWalletsModal} = useContext(AuthContext);
     const {refreshWalletHasAffiliateAccounts} = useContext(WalletAffiliateAccountsContext);
     const {projectLoading, project} = useProject(owner as string, candyMachine as string, true);
     const [isRegistering, setIsRegistering] = useState<boolean>(false);
 
-    const onAffiliateRegistrationFormSubmit = async (e: any) => {
-        e.preventDefault();
-
-        if (isRegistering) {
-            return;
-        }
-
-        setIsRegistering(true);
-
+    const registerAsAffiliate = async () => {
         try {
             await registerAffiliateAccount({
                 owner: new PublicKey(owner as string),
@@ -55,6 +47,30 @@ export default function ProjectDetails() {
             setIsRegistering(false);
         }
     };
+
+    const onAffiliateRegistrationClick = () => {
+        if (isRegistering) {
+            return;
+        }
+
+        setIsRegistering(true);
+
+        if (!wallet.connected) {
+            showWalletsModal();
+
+            return;
+        }
+
+        registerAsAffiliate();
+    };
+
+    useEffect(() => {
+        (async () => {
+            if (wallet.connected && isRegistering) {
+                registerAsAffiliate();
+            }
+        })();
+    }, [wallet.connected]);
 
     return (
         <Container maxWidth="xl" sx={{p: 3}} className="nft-project nft-project--single">
@@ -120,15 +136,14 @@ export default function ProjectDetails() {
                             className="nft-project__actions"
                             sx={{marginTop: 3}}
                         >
-                            {wallet.connected &&
-                                project.projectAccount.data.max_affiliate_count > project.projectAccount.data.affiliate_count &&
+                            {project.projectAccount.data.max_affiliate_count > project.projectAccount.data.affiliate_count &&
                                 <LoadingButton
                                     loading={isRegistering}
-                                    onClick={onAffiliateRegistrationFormSubmit}
+                                    onClick={onAffiliateRegistrationClick}
                                     variant="contained"
                                     color="success"
                                 >
-                                    Become an Affiliate
+                                    Register as Affiliate
                                 </LoadingButton>
                             }
 

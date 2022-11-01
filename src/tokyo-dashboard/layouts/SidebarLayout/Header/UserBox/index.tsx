@@ -69,7 +69,7 @@ function HeaderUserBox() {
                         startIcon={<PersonTwoToneIcon />}
                         onClick={showWalletsModal}
                     >
-                        Login
+                        Connect Wallet
                     </Button>
                 </>
                 :

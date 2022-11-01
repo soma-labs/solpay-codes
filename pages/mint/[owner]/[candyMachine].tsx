@@ -19,7 +19,7 @@ export default function ProjectMint() {
     const {setMessage} = useContext(PopupMessageContext);
     const router = useRouter();
     const {owner, candyMachine, affiliate} = router.query;
-    const {wallet, connection} = useContext(AuthContext);
+    const {wallet, connection, showWalletsModal} = useContext(AuthContext);
     const [qrImageData, setQrImageData] = useState<string | null>(null);
     const {projectLoading, project} = useProject(owner as string, candyMachine as string);
     const [isMinting, setIsMinting] = useState<boolean>(false);
@@ -159,9 +159,20 @@ export default function ProjectMint() {
                             </Box>
                         }
                         {!wallet.connected ?
-                            <Typography variant="h4">You have to login in order to mint</Typography>
+                            <Typography variant="h4">
+                                You have to
+                                &nbsp;
+                                <a href='#' className="link" onClick={(e: any) => {
+                                    e.preventDefault();
+                                    showWalletsModal();
+                                }}>
+                                    connect your wallet
+                                </a>
+                                &nbsp;
+                                in order to mint
+                            </Typography>
                             :
-                            (
+                            candyMachineAccount !== null && (
                                 !isLive(candyMachineAccount) ?
                                     <Button fullWidth variant="contained" color="secondary" size="large">
                                         Minting starts on {getGoLiveDate(candyMachineAccount, true)}

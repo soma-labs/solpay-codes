@@ -56,7 +56,6 @@ export default function MyEarnings() {
                 } else {
                     console.log(e);
                 }
-
             }
 
             setIsClaimingReward(false);
