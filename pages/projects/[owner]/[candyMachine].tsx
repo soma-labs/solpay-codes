@@ -153,7 +153,7 @@ export default function ProjectDetails() {
                                         variant="contained"
                                         color="success"
                                     >
-                                        GO TO MINT
+                                        GET NFT
                                     </Button>
                                 </a>
                             </Link>
