@@ -9,8 +9,10 @@ import {getCandyMachineAccount, mintOneToken} from "./candy-machine";
 import getAffiliateAccountAddress from "../program/affiliate-accounts/get-affiliate-account-address";
 import {
     createAssociatedTokenAccountInstruction,
-    createMintToCheckedInstruction, createMintToInstruction,
-    getAssociatedTokenAddress
+    createMintToCheckedInstruction,
+    createMintToInstruction,
+    getAccount,
+    getAssociatedTokenAddress, TokenAccountNotFoundError
 } from "@solana/spl-token";
 
 const SOLPAY_TREASURY = process.env.NEXT_PUBLIC_SOLPAY_TREASURY as string;
@@ -89,10 +91,20 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
             const whitelistNftPrice = candyMachineAccount.state.whitelistMintSettings.discountPrice.toNumber();
             solpayFee = SOLPAY_FEE_AFFILIATE_MINT_PERCENTAGE * whitelistNftPrice / 100;
 
+            let walletWhitelistTokenAccountInitialized = false;
             let walletWhitelistAta = await getAssociatedTokenAddress(
                 WHITELIST_TOKEN_MINT,
                 walletPublicKey,
             );
+
+            try {
+                await getAccount(connection, walletWhitelistAta);
+                walletWhitelistTokenAccountInitialized = true;
+            } catch (e) {
+                if (e instanceof TokenAccountNotFoundError) {
+                    console.log(e.message);
+                }
+            }
 
             const whitelistTokenTransferInstruction = await createMintToInstruction(
                 WHITELIST_TOKEN_MINT, // mint
@@ -104,14 +116,16 @@ const candyMachineTransactionHandler = async (req: NextApiRequest, res: NextApiR
 
             instructions.unshift(whitelistTokenTransferInstruction);
 
-            const createWhitelistAtaInstruction = createAssociatedTokenAccountInstruction(
-                walletPublicKey, // payer
-                walletWhitelistAta, // ata
-                walletPublicKey, // owner
-                WHITELIST_TOKEN_MINT // mint
-            );
+            if (!walletWhitelistTokenAccountInitialized) {
+                const createWhitelistAtaInstruction = createAssociatedTokenAccountInstruction(
+                    walletPublicKey, // payer
+                    walletWhitelistAta, // ata
+                    walletPublicKey, // owner
+                    WHITELIST_TOKEN_MINT // mint
+                );
 
-            instructions.unshift(createWhitelistAtaInstruction);
+                instructions.unshift(createWhitelistAtaInstruction);
+            }
 
             const affiliateWalletFeeInstruction = SystemProgram.transfer({
                 fromPubkey: walletPublicKey,
