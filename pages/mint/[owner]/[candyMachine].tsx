@@ -220,7 +220,7 @@ export default function ProjectMint() {
                                     </ListItem>
                                     <ListItem disableGutters>
                                         <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
-                                            <strong>Full Price:</strong>
+                                            <strong>Full Mint Price:</strong>
                                             <span>
                                                 {candyMachineAccount.state.price.toNumber() / LAMPORTS_PER_SOL}{SolTokenIcon}
                                             </span>
@@ -229,7 +229,7 @@ export default function ProjectMint() {
                                     {candyMachineAccount.state.whitelistMintSettings && candyMachineAccount.state.whitelistMintSettings.discountPrice !== null &&
                                         <ListItem disableGutters>
                                             <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
-                                                <strong>Discount Price:</strong>
+                                                <strong>Discounted Mint Price:</strong>
                                                 <span>
                                                     {getDiscountedNftPrice(
                                                         candyMachineAccount.state.whitelistMintSettings.discountPrice.toNumber(),

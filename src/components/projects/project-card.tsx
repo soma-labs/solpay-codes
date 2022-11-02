@@ -1,4 +1,4 @@
-import {Card, CardActionArea, CardActions, CardContent, CardMedia, Typography} from "@mui/material";
+import {Box, Card, CardActionArea, CardActions, CardContent, CardMedia, Typography} from "@mui/material";
 
 type ProjectCardPropsType = {
     title?: string,
@@ -30,13 +30,13 @@ export default function ProjectCard(props: ProjectCardPropsType) {
                         {props.description}
                     </Typography>
                 </CardContent>
-            </CardActionArea>
 
-            {props.actions &&
-                <CardActions>
-                    {props.actions}
-                </CardActions>
-            }
+                {props.actions &&
+                    <Box sx={{display: 'flex', justifyContent: 'center', p: 2}}>
+                        {props.actions}
+                    </Box>
+                }
+            </CardActionArea>
         </Card>
     );
 }

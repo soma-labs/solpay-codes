@@ -39,7 +39,6 @@ export default function AuthProvider({children}: {children: any}) {
 
     WalletAdapters.forEach(wallet => {
         wallet.on('readyStateChange', (readyState: WalletReadyState) => {
-            console.log(chosenWallet, readyState);
             if (readyState === WalletReadyState.Installed && chosenWallet === wallet.name) {
                 loginWithWallet(wallet);
             }

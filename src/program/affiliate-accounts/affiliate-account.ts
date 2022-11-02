@@ -87,6 +87,14 @@ export default class AffiliateAccount {
         return this.project;
     }
 
+    getProjectLink(): string {
+        return getUrlWithBase(`/projects/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}`);
+    }
+
+    getProjectMintLink(): string {
+        return getUrlWithBase(`/mint/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}?affiliate=${this.data.affiliate_pubkey.toString()}`);
+    }
+
     hasReachedTarget(): boolean {
         if (!this.project) {
             return false;
@@ -103,24 +111,47 @@ export default class AffiliateAccount {
         return (100 * (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) / this.project.projectAccount.data.affiliate_target_in_sol).toFixed(2);
     }
 
-    getProjectLink(): string {
-        return getUrlWithBase(`/projects/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}`);
+    getBalance(): number {
+        return this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol;
     }
 
-    getProjectMintLink(): string {
-        return getUrlWithBase(`/mint/${this.data.project_owner_pubkey.toString()}/${this.data.candy_machine_id.toString()}?affiliate=${this.data.affiliate_pubkey.toString()}`);
+    getHistoricalBalance(): number {
+        return this.lamports / LAMPORTS_PER_SOL + this.data.total_redeemed_amount_in_sol - AffiliateAccountRentInSol;
     }
 
-    mintCount(whiteListNftPrice: BN | null): number {
+    getSolToTarget(): string {
+        if (!this.project) {
+            return '0';
+        }
+
+        return (this.project.projectAccount.data.affiliate_target_in_sol - (this.lamports / LAMPORTS_PER_SOL) - AffiliateAccountRentInSol).toFixed(2);
+    }
+
+    mintsToTarget(whiteListNftPrice: BN | null): number {
         if (!this.project || !whiteListNftPrice) {
             return 0;
         }
 
         const nftPriceInSol = whiteListNftPrice.toNumber() / LAMPORTS_PER_SOL;
-        const historicBalance = this.lamports / LAMPORTS_PER_SOL + this.data.total_redeemed_amount_in_sol - AffiliateAccountRentInSol;
+
+        return Math.ceil(this.project.projectAccount.data.affiliate_target_in_sol / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100));
+    }
+
+    mintCount(whiteListNftPrice: BN | null, allTime: boolean = false): number {
+        if (!this.project || !whiteListNftPrice) {
+            return 0;
+        }
+
+        const nftPriceInSol = whiteListNftPrice.toNumber() / LAMPORTS_PER_SOL;
+
+        let balance = this.getBalance();
+
+        if (allTime) {
+            const balance = this.getHistoricalBalance();
+        }
 
         /* Floating point arithmetic FTW */
-        return Math.ceil(historicBalance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100));
+        return Math.ceil(balance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100));
     }
 
     createdAt(): string {

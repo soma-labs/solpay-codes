@@ -11,7 +11,7 @@ import {
 import AccountsOrderFilter from "../src/components/accounts-order-filter";
 import AccountsSearchFilter from "../src/components/accounts-search-filter";
 import useQueryParamsSearch from "../src/hooks/useQueryParamsSearch";
-import {Box, Container, Divider, Grid, useMediaQuery, useTheme} from "@mui/material";
+import {Box, Button, Container, Divider, Grid, useMediaQuery, useTheme} from "@mui/material";
 import PageTitleWrapper from "../src/tokyo-dashboard/components/PageTitleWrapper";
 import LoadingIcon from "../src/components/loading-icon";
 
@@ -70,6 +70,9 @@ export default function Home() {
                                                     title={project.getTitle()}
                                                     description={project.projectData?.description}
                                                     imageUrl={project.projectData?.image_url}
+                                                    actions={[
+                                                        <Button key={0} size="small" color="success" variant="contained">Register</Button>
+                                                    ]}
                                                 />
                                             </a>
                                         </Link>

@@ -111,7 +111,7 @@ export default function MyEarnings() {
             <Link href={affiliateLink}>
                 <a onClick={copyLinkToClipboard}>
                     <Button startIcon={<ContentCopyIcon/>} size="small">
-                        {linkCopied ?  `Copied` : `Copy Affiliate Link`}
+                        {linkCopied ?  `Copied` : `Your Affiliate Link`}
                     </Button>
                 </a>
             </Link>
@@ -126,7 +126,7 @@ export default function MyEarnings() {
                 </Typography>
             </PageTitleWrapper>
 
-            <Container maxWidth="md" sx={{paddingBottom: 4}}>
+            <Container maxWidth="lg" sx={{paddingBottom: 4}}>
                 {affiliateAccountsLoading ? <LoadingIcon/> :
                     !affiliateAccounts.length ?
                         <Typography variant="h4" component="h4">

@@ -1,5 +1,5 @@
 import {useRouter} from "next/router";
-import {PublicKey} from "@solana/web3.js";
+import {LAMPORTS_PER_SOL, PublicKey} from "@solana/web3.js";
 import registerAffiliateAccount from "../../../src/program/affiliate-accounts/register-affiliate-account";
 import useProject from "../../../src/hooks/useProject";
 import {useContext, useEffect, useState} from "react";
@@ -9,10 +9,12 @@ import LoadingIcon from "../../../src/components/loading-icon";
 import {WalletAffiliateAccountsContext} from "../../../src/providers/wallet-affiliate-accounts-provider";
 import {sleep} from "@toruslabs/base-controllers";
 import Image from "next/image";
-import {Box, Button, Card, Container, Grid, List, ListItem, Typography} from "@mui/material";
+import {Box, Button, Card, CircularProgress, Container, Grid, List, ListItem, Typography} from "@mui/material";
 import {LoadingButton} from "@mui/lab";
 import {SolTokenIcon} from "../../../src/program/constants";
 import Link from "next/link";
+import useCandyMachineAccount from "../../../src/hooks/useCandyMachineAccount";
+import getDiscountedNftPrice from "../../../src/program/utils/discount-price-calculator";
 
 export default function ProjectDetails() {
     const router = useRouter();
@@ -22,6 +24,7 @@ export default function ProjectDetails() {
     const {refreshWalletHasAffiliateAccounts} = useContext(WalletAffiliateAccountsContext);
     const {projectLoading, project} = useProject(owner as string, candyMachine as string, true);
     const [isRegistering, setIsRegistering] = useState<boolean>(false);
+    const candyMachineAccount = useCandyMachineAccount(candyMachine as string|null);
 
     const registerAsAffiliate = async () => {
         try {
@@ -101,6 +104,33 @@ export default function ProjectDetails() {
                             </Typography>
 
                             <List dense disablePadding>
+                                {!candyMachineAccount ?
+                                    <CircularProgress size="2rem"/>
+                                    :
+                                    <>
+                                        <ListItem disableGutters>
+                                            <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                                <strong>Full Mint Price:</strong>
+                                                <span>
+                                                    {candyMachineAccount.state.price.toNumber() / LAMPORTS_PER_SOL}{SolTokenIcon}
+                                                </span>
+                                            </Box>
+                                        </ListItem>
+                                        {candyMachineAccount.state.whitelistMintSettings && candyMachineAccount.state.whitelistMintSettings.discountPrice !== null &&
+                                            <ListItem disableGutters>
+                                                <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
+                                                    <strong>Discounted Mint Price:</strong>
+                                                    <span>
+                                                        {getDiscountedNftPrice(
+                                                            candyMachineAccount.state.whitelistMintSettings.discountPrice.toNumber(),
+                                                            project.projectAccount.data.affiliate_fee_percentage
+                                                        ).toPrecision(3)}{SolTokenIcon}
+                                                    </span>
+                                                </Box>
+                                            </ListItem>
+                                        }
+                                    </>
+                                }
                                 <ListItem disableGutters>
                                     <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
                                         <strong>Affiliate Fee:</strong>
@@ -119,7 +149,7 @@ export default function ProjectDetails() {
                                 </ListItem>
                                 <ListItem disableGutters>
                                     <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
-                                        <strong>Affiliates:</strong>
+                                        <strong>Number of Registered Affiliates:</strong>
                                         <span>
                                             {project.projectAccount.data.affiliate_count}/{project.projectAccount.data.max_affiliate_count}
                                         </span>

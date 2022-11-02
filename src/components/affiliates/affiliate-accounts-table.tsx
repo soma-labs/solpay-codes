@@ -1,6 +1,7 @@
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip} from "@mui/material";
 import AffiliateAccount from "../../program/affiliate-accounts/affiliate-account";
 import AffiliateAccountRow from "./affiliate-account-row";
+import InfoIcon from '@mui/icons-material/Info';
 
 export type AffiliateAccountsTablePropsType = {
     affiliateAccounts: AffiliateAccount[],
@@ -13,10 +14,10 @@ export default function AffiliateAccountsTable({affiliateAccounts,  actions}: Af
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>Image</TableCell>
-                        <TableCell>Title</TableCell>
-                        <TableCell>Mints</TableCell>
-                        <TableCell>Progress</TableCell>
+                        <TableCell sx={{width: '13rem'}}>Project</TableCell>
+                        <TableCell>NFT Mints</TableCell>
+                        <TableCell>Your Earnings</TableCell>
+                        <TableCell>Unclaimed Earnings</TableCell>
                         <TableCell align="right">Actions</TableCell>
                     </TableRow>
                 </TableHead>
