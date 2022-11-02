@@ -63,13 +63,13 @@ export default function AffiliateAccountRow({affiliateAccount, actions}: Affilia
             <TableCell>
                 <Box display="flex">
                     <Typography>
-                        {affiliateAccount.getBalance()} / {affiliateAccount.project?.projectAccount.data.affiliate_target_in_sol} {SolTokenIcon}
+                        {affiliateAccount.getBalance().toFixed(2)} / {affiliateAccount.project?.projectAccount.data.affiliate_target_in_sol} {SolTokenIcon}
                     </Typography>
                     <Tooltip title={`You need to collect a minimum of
                         ${affiliateAccount.project?.projectAccount.data.affiliate_target_in_sol}
                         SOL to withdraw your earnings.
-                        ${parseFloat(affiliateAccount.getSolToTarget()) < affiliateAccount.project!.projectAccount.data.affiliate_target_in_sol ? `Good job, ` : ``}
-                        ${affiliateAccount.getSolToTarget()} SOL to go.
+                        ${affiliateAccount.getSolToTarget() < affiliateAccount.project!.projectAccount.data.affiliate_target_in_sol ? `Good job, ` : ``}
+                        ${affiliateAccount.getSolToTarget().toFixed(2)} SOL to go.
                     `}>
                         <InfoIcon fontSize="small" color="disabled" sx={{ml: 1}}/>
                     </Tooltip>

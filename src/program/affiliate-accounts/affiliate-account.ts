@@ -103,14 +103,6 @@ export default class AffiliateAccount {
         return (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) >= this.project.projectAccount.data.affiliate_target_in_sol;
     }
 
-    targetProgress(): string {
-        if (!this.project) {
-            return '0';
-        }
-
-        return (100 * (this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol) / this.project.projectAccount.data.affiliate_target_in_sol).toFixed(2);
-    }
-
     getBalance(): number {
         return this.lamports / LAMPORTS_PER_SOL - AffiliateAccountRentInSol;
     }
@@ -119,12 +111,20 @@ export default class AffiliateAccount {
         return this.lamports / LAMPORTS_PER_SOL + this.data.total_redeemed_amount_in_sol - AffiliateAccountRentInSol;
     }
 
-    getSolToTarget(): string {
+    targetProgressPercentage(): number {
         if (!this.project) {
-            return '0';
+            return 0;
         }
 
-        return (this.project.projectAccount.data.affiliate_target_in_sol - (this.lamports / LAMPORTS_PER_SOL) - AffiliateAccountRentInSol).toFixed(2);
+        return 100 * this.getBalance() / this.project.projectAccount.data.affiliate_target_in_sol;
+    }
+
+    getSolToTarget(): number {
+        if (!this.project) {
+            return 0;
+        }
+
+        return this.project.projectAccount.data.affiliate_target_in_sol - (this.lamports / LAMPORTS_PER_SOL) - AffiliateAccountRentInSol;
     }
 
     mintsToTarget(whiteListNftPrice: BN | null): number {
@@ -147,7 +147,7 @@ export default class AffiliateAccount {
         let balance = this.getBalance();
 
         if (allTime) {
-            const balance = this.getHistoricalBalance();
+            balance = this.getHistoricalBalance();
         }
 
         /* Floating point arithmetic FTW */
