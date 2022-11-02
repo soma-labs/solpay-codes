@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from "react";
 import {AvanaWalletAdapter, PhantomWalletAdapter, SolflareWalletAdapter} from "@solana/wallet-adapter-wallets";
 import * as Web3 from "@solana/web3.js";
 import {Connection, PublicKey} from "@solana/web3.js";
-import {WalletAdapter, WalletNotReadyError} from "@solana/wallet-adapter-base";
+import {WalletAdapter, WalletNotReadyError, WalletReadyState} from "@solana/wallet-adapter-base";
 import Image from "next/image";
 import {PopupMessageContext, PopupMessageTypes} from "./popup-message-provider";
 import {Box, Button, List, ListItem, Modal, Typography} from "@mui/material";
@@ -33,10 +33,18 @@ export default function AuthProvider({children}: {children: any}) {
     const {setMessage} = useContext(PopupMessageContext);
     let [isConnected, setIsConnected] = useState<boolean>(false);
     let [chosenWallet, setChosenWallet] = useState<string | null>(null);
-    let [wallet, setWallet] = useState<WalletAdapter>(new PhantomWalletAdapter());
+    let [modalVisible, setModalVisible] = useState<boolean>(false);
+    let [wallet, setWallet] = useState<WalletAdapter>(WalletAdapters[0]);
     let [connection] = useState<Connection>(defaultConnection);
 
-    let [modalVisible, setModalVisible] = useState<boolean>(false);
+    WalletAdapters.forEach(wallet => {
+        wallet.on('readyStateChange', (readyState: WalletReadyState) => {
+            console.log(chosenWallet, readyState);
+            if (readyState === WalletReadyState.Installed && chosenWallet === wallet.name) {
+                loginWithWallet(wallet);
+            }
+        });
+    });
 
     wallet
         .on('connect', (publicKey: PublicKey) => setIsConnected(true))
@@ -88,7 +96,8 @@ export default function AuthProvider({children}: {children: any}) {
     useEffect(() => {
         if (!isConnected && chosenWallet) {
             const wallet = WalletAdapters.find(walletAdapter => walletAdapter.name === chosenWallet);
-            if (wallet) {
+
+            if (wallet && wallet.readyState === WalletReadyState.Installed) {
                 loginWithWallet(wallet);
             }
         }
