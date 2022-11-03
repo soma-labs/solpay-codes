@@ -130,12 +130,11 @@ export default function MyEarnings() {
                 {affiliateAccountsLoading ? <LoadingIcon/> :
                     !affiliateAccounts.length ?
                         <Typography variant="h4" component="h4">
-                            You must register as an affiliate with one of our
-                            <Link href={`/`}><a className="link">projects</a></Link>
-                            before you can see your earnings.
+                            Register as an affiliate with one of our&nbsp;
+                            <Link href={`/`}><a className="link">projects</a></Link>&nbsp;
+                            and start earning.
                         </Typography>
                         :
-
                         <Card>
                             <CardHeader title="Affiliated NFT Projects"/>
 
