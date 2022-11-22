@@ -9,7 +9,7 @@ import LoadingIcon from "../../../src/components/loading-icon";
 import {WalletAffiliateAccountsContext} from "../../../src/providers/wallet-affiliate-accounts-provider";
 import {sleep} from "@toruslabs/base-controllers";
 import Image from "next/image";
-import {Box, Button, Card, CircularProgress, Container, Grid, List, ListItem, Typography} from "@mui/material";
+import {Box, Button, CircularProgress, Container, Grid, List, ListItem, Typography} from "@mui/material";
 import {LoadingButton} from "@mui/lab";
 import {SolTokenIcon} from "../../../src/program/constants";
 import Link from "next/link";
@@ -22,9 +22,16 @@ export default function ProjectDetails() {
     const {setMessage} = useContext(PopupMessageContext);
     const {wallet, connection, showWalletsModal} = useContext(AuthContext);
     const {refreshWalletHasAffiliateAccounts} = useContext(WalletAffiliateAccountsContext);
-    const {projectLoading, project} = useProject(owner as string, candyMachine as string, true);
+    const {projectLoading, project, affiliateAccounts} = useProject(owner as string, candyMachine as string, true);
     const [isRegistering, setIsRegistering] = useState<boolean>(false);
     const candyMachineAccount = useCandyMachineAccount(candyMachine as string|null);
+    const walletIsProjectAffiliate = affiliateAccounts.findIndex(affiliateAccount => {
+        if (!wallet || !wallet.publicKey) {
+            return false;
+        }
+
+        return affiliateAccount.data.affiliate_pubkey.toString() === wallet.publicKey.toString();
+    }) !== -1;
 
     const registerAsAffiliate = async () => {
         try {
@@ -166,7 +173,7 @@ export default function ProjectDetails() {
                             className="nft-project__actions"
                             sx={{marginTop: 3}}
                         >
-                            {project.projectAccount.data.max_affiliate_count > project.projectAccount.data.affiliate_count &&
+                            {project.projectAccount.data.max_affiliate_count > project.projectAccount.data.affiliate_count && !walletIsProjectAffiliate &&
                                 <LoadingButton
                                     loading={isRegistering}
                                     onClick={onAffiliateRegistrationClick}

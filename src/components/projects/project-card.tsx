@@ -1,4 +1,4 @@
-import {Box, Card, CardActionArea, CardActions, CardContent, CardMedia, Typography} from "@mui/material";
+import {Box, Card, CardContent, CardMedia, Typography} from "@mui/material";
 
 type ProjectCardPropsType = {
     title?: string,
