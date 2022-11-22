@@ -11,10 +11,11 @@ import {
 import AccountsOrderFilter from "../src/components/accounts-order-filter";
 import AccountsSearchFilter from "../src/components/accounts-search-filter";
 import useQueryParamsSearch from "../src/hooks/useQueryParamsSearch";
-import {Box, Button, Container, Divider, Grid, Typography, useMediaQuery, useTheme} from "@mui/material";
+import {Box, Button, CircularProgress, Container, Divider, Grid, Typography, useMediaQuery, useTheme} from "@mui/material";
 import PageTitleWrapper from "../src/tokyo-dashboard/components/PageTitleWrapper";
 import LoadingIcon from "../src/components/loading-icon";
 import {SolTokenIcon} from "../src/program/constants";
+import useSiteStats from "../src/hooks/useSiteStats";
 
 export default function Home() {
     const theme = useTheme();
@@ -22,6 +23,7 @@ export default function Home() {
     const queryParamsPagination = useQueryParamsPagination();
     const queryParamsOrdering = useQueryParamsOrdering();
     const queryParamsSearch = useQueryParamsSearch();
+    const siteStats = useSiteStats();
     const {projects, projectsLoading, pagination} = useProjects(
         false,
         0,
@@ -56,27 +58,33 @@ export default function Home() {
             <Container maxWidth="xl" sx={{paddingBottom: 4}}>
                 <Grid container maxWidth={theme.breakpoints.values.lg} justifyContent="center" alignItems="center" sx={{margin: '0 auto 1rem auto'}}>
                     <Grid item xs={12} md={4} textAlign="center" mb={3}>
-                        <Typography variant="h3" component="h3">
-                            3
-                        </Typography>
+                        {!siteStats ? <CircularProgress size={'1.5rem'}/> :
+                            <Typography variant="h3" component="h3">
+                                {siteStats.projectAccounts}
+                            </Typography>
+                        }
                         <Typography variant="h3" component="p">
-                            NFT projects
+                            NFT project{siteStats && siteStats.projectAccounts !== 1 ? `s` : ''}
                         </Typography>
                     </Grid>
                     <Grid item xs={12} md={4} textAlign="center" mb={3}>
-                        <Typography variant="h3" component="h3">
-                            1236{SolTokenIcon}
-                        </Typography>
+                        {!siteStats ? <CircularProgress size={'1.5rem'}/> :
+                            <Typography variant="h3" component="h3">
+                                {siteStats.solInAffiliateFeesAvailable.toFixed(2)}{SolTokenIcon}
+                            </Typography>
+                        }
                         <Typography variant="h3" component="p">
                             in affiliate fees available!
                         </Typography>
                     </Grid>
                     <Grid item xs={12} md={4} textAlign="center" mb={3}>
-                        <Typography variant="h3" component="h3">
-                            21
-                        </Typography>
+                        {!siteStats ? <CircularProgress size={'1.5rem'}/> :
+                            <Typography variant="h3" component="h3">
+                                {siteStats.affiliateAccounts}
+                            </Typography>
+                        }
                         <Typography variant="h3" component="p">
-                            registered affiliates!
+                            registered affiliate{siteStats && siteStats.affiliateAccounts !== 1 ? `s` : ''}!
                         </Typography>
                     </Grid>
                 </Grid>

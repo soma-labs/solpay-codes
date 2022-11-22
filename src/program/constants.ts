@@ -9,7 +9,6 @@ export enum CmaProgramInstructions {
     RegisterAffiliateAccount = 3,
     RedeemReward = 4,
     CloseAffiliateAccount = 5,
-    IncrementAffiliateAccountMintCount = 6,
 }
 
 export const SolTokenIcon = '◎';
