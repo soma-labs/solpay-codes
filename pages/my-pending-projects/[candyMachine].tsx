@@ -95,9 +95,13 @@ export default function MyPendingProject() {
                                     {pendingProject.title}
                                 </Typography>
 
-                                <Typography component="p" className="nft-project__description">
-                                    {pendingProject.description}
-                                </Typography>
+                                <Typography
+                                    component="div"
+                                    className="nft-project__description"
+                                    dangerouslySetInnerHTML={{
+                                        __html: pendingProject.description?.replace(/\r\n|\r|\n/g, "<br>") ?? ''
+                                    }}
+                                />
                             </Box>
 
                             <Container maxWidth="sm" sx={{m: 0}}>

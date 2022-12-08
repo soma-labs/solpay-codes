@@ -6,6 +6,8 @@ type ProjectDataPropsType = {
     title: string,
     description?: string,
     url?: string,
+    discord_url?: string,
+    twitter_url?: string,
     image_url?: string
 };
 
@@ -15,6 +17,8 @@ export default class ProjectData {
     title: string;
     description?: string;
     url?: string;
+    discord_url?: string;
+    twitter_url?: string;
     image_url?: string;
 
     constructor(data: ProjectDataPropsType) {
@@ -23,6 +27,8 @@ export default class ProjectData {
         this.title = data.title;
         this.description = data.description;
         this.url = data.url;
+        this.discord_url = data.discord_url;
+        this.twitter_url = data.twitter_url;
         this.image_url = data.image_url;
     }
 }

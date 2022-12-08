@@ -14,6 +14,7 @@ import useCandyMachineAccount from "../../../src/hooks/useCandyMachineAccount";
 import {SolTokenIcon} from "../../../src/program/constants";
 import getDiscountedNftPrice from "../../../src/program/utils/discount-price-calculator";
 import {CandyMachineAccount} from "../../../src/candy-machine/candy-machine";
+import Link from "next/link";
 
 export default function ProjectMint() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -142,14 +143,41 @@ export default function ProjectMint() {
                                 <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
                             }
                         </Box>
+                        <Box className="nft-project__social-links" mb={3}>
+                            {project.projectData?.url &&
+                                <Link href={project.projectData.url}>
+                                    <a target={'_blank'}>
+                                        <Image src={`/images/website-icon.png`} alt="" width={50} height={50}/>
+                                    </a>
+                                </Link>
+                            }
+                            {project.projectData?.twitter_url &&
+                                <Link href={project.projectData.twitter_url}>
+                                    <a target={'_blank'}>
+                                        <Image src={`/images/twitter-icon.png`} alt="" width={50} height={50}/>
+                                    </a>
+                                </Link>
+                            }
+                            {project.projectData?.discord_url &&
+                                <Link href={project.projectData.discord_url}>
+                                    <a target={'_blank'}>
+                                        <Image src={`/images/discord-icon.png`} alt="" width={50} height={50}/>
+                                    </a>
+                                </Link>
+                            }
+                        </Box>
                         <Box component="header" className="nft-project__header" mb={3}>
                             <Typography variant="h1" className="nft-project__title" mb={2}>
                                 {project.getTitle()}
                             </Typography>
 
-                            <Typography component="p" className="nft-project__description">
-                                {project.projectData?.description}
-                            </Typography>
+                            <Typography
+                                component="div"
+                                className="nft-project__description"
+                                dangerouslySetInnerHTML={{
+                                    __html: project.projectData?.description?.replace(/\r\n|\r|\n/g, "<br>") ?? ''
+                                }}
+                            />
                         </Box>
                     </Grid>
                     <Grid item xs={12} md={4} display="flex" flexDirection="column" alignItems="center">

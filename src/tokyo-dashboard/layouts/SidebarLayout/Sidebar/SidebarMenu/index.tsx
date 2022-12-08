@@ -58,6 +58,9 @@ const SubMenuWrapper = styled(Box)(({theme}) => `
     
         .MuiButton-root {
           display: flex;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
           color: ${theme.colors.alpha.trueWhite[70]};
           background-color: transparent;
           width: 100%;

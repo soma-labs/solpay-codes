@@ -87,9 +87,32 @@ export default function ProjectDetails() {
             {projectLoading ? <LoadingIcon/> : !project ? null :
                 <Grid container display="flex" justifyContent="center" spacing={3}>
                     <Grid item xs={12} md={4} display="flex" flexDirection="column" alignItems="center">
-                        <Box className="nft-project__image-container">
+                        <Box className="nft-project__image-container" mb={3}>
                             {project.projectData?.image_url &&
                                 <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
+                            }
+                        </Box>
+                        <Box className="nft-project__social-links">
+                            {project.projectData?.url &&
+                                <Link href={project.projectData.url}>
+                                    <a target={'_blank'}>
+                                        <Image src={`/images/website-icon.png`} alt="" width={50} height={50}/>
+                                    </a>
+                                </Link>
+                            }
+                            {project.projectData?.twitter_url &&
+                                <Link href={project.projectData.twitter_url}>
+                                    <a target={'_blank'}>
+                                        <Image src={`/images/twitter-icon.png`} alt="" width={50} height={50}/>
+                                    </a>
+                                </Link>
+                            }
+                            {project.projectData?.discord_url &&
+                                <Link href={project.projectData.discord_url}>
+                                    <a target={'_blank'}>
+                                        <Image src={`/images/discord-icon.png`} alt="" width={50} height={50}/>
+                                    </a>
+                                </Link>
                             }
                         </Box>
                     </Grid>
@@ -100,9 +123,13 @@ export default function ProjectDetails() {
                                 {project.getTitle()}
                             </Typography>
 
-                            <Typography component="p" className="nft-project__description">
-                                {project.projectData?.description}
-                            </Typography>
+                            <Typography
+                                component="div"
+                                className="nft-project__description"
+                                dangerouslySetInnerHTML={{
+                                    __html: project.projectData?.description?.replace(/\r\n|\r|\n/g, "<br>") ?? ''
+                                }}
+                            />
                         </Box>
 
                         <Box component="section" className="nft-project__details">
