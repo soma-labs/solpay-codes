@@ -4,6 +4,7 @@ import {SystemProgram, SYSVAR_SLOT_HASHES_PUBKEY, PublicKey, Connection} from '@
 import {CIVIC, getAtaForMint, getNetworkExpire, getNetworkToken, SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID} from './candy-machine-utils';
 import {PhantomWalletAdapter} from "@solana/wallet-adapter-wallets";
 import {Wallet} from "@project-serum/anchor/dist/cjs/provider";
+import {sleep} from "@toruslabs/base-controllers";
 
 export const CANDY_MACHINE_PROGRAM = new anchor.web3.PublicKey('cndy3Z4yapfJBmL3ShUp5exZKqR3z33thTzeNMm2gRZ',);
 
@@ -102,162 +103,174 @@ export const getCandyMachineAccount = async (
         publicKey: walletPublicKey
     };
 
-    try {
-        const candyMachinePublicKey = new PublicKey(candyMachineId);
-        const cndy = await getCandyMachineState(
-            anchorWallet,
-            candyMachinePublicKey,
-            connection,
-        );
+    const candyMachinePublicKey = new PublicKey(candyMachineId);
+    const cndy = await getCandyMachineState(
+        anchorWallet,
+        candyMachinePublicKey,
+        connection,
+    );
 
-        const currentSlot = await connection.getSlot();
-        const blockTime = (await connection.getBlockTime(
-            currentSlot,
-        )) as number;
-        const shift = new Date().getTime() / 1000 - blockTime;
+    const currentSlot = await connection.getSlot();
+    let blockTime = null;
+    let i = 0;
 
-        let active =
-            cndy?.state.goLiveDate?.toNumber() + shift <
-            new Date().getTime() / 1000;
-        let presale = false;
+    while (i < 5) {
+        try {
+            blockTime = (await connection.getBlockTime(
+                currentSlot,
+            )) as number;
 
-        // duplication of state to make sure we have the right values!
-        let isWLUser = false;
-        let userPrice = cndy.state.price;
-
-        // whitelist mint?
-        if (cndy?.state.whitelistMintSettings) {
-            // is it a presale mint?
-            if (
-                cndy.state.whitelistMintSettings.presale &&
-                (!cndy.state.goLiveDate ||
-                    cndy.state.goLiveDate.toNumber() + shift >
-                    new Date().getTime() / 1000)
-            ) {
-                presale = true;
-            }
-
-            // is there a discount?
-            if (cndy.state.whitelistMintSettings.discountPrice) {
-                userPrice = cndy.state.whitelistMintSettings.discountPrice;
-            } else {
-                // when presale=false and discountPrice=null, mint is restricted
-                // to whitelist users only
-                if (!cndy.state.whitelistMintSettings.presale) {
-                    cndy.state.isWhitelistOnly = true;
-                }
-            }
-
-            // retrieves the whitelist token
-            // const mint = new anchor.web3.PublicKey(
-            //     cndy.state.whitelistMintSettings.mint,
-            // );
-            // const token = (
-            //     await getAtaForMint(mint, walletPublicKey)
-            // )[0];
-            //
-            // try {
-            //     const balance = await connection.getTokenAccountBalance(token);
-            //     isWLUser = parseInt(balance.value.amount) > 0;
-            //     // only whitelist the user if the balance > 0
-            //
-            //     if (cndy.state.isWhitelistOnly) {
-            //         active = isWLUser && (presale || active);
-            //     }
-            // } catch (e) {
-            //     // no whitelist user, no mint
-            //     if (cndy.state.isWhitelistOnly) {
-            //         active = false;
-            //     }
-            //     console.log(
-            //         'There was a problem fetching whitelist token balance',
-            //     );
-            //     console.log(e);
-            // }
+            break;
+        } catch (e) {
+            i++;
         }
 
-        userPrice = isWLUser ? userPrice : cndy.state.price;
-
-        if (cndy?.state.tokenMint) {
-            // retrieves the SPL token
-            const mint = new anchor.web3.PublicKey(cndy.state.tokenMint);
-            const token = (
-                await getAtaForMint(mint, walletPublicKey)
-            )[0];
-
-            try {
-                const balance = await connection.getTokenAccountBalance(token);
-
-                const valid = new anchor.BN(balance.value.amount).gte(userPrice);
-
-                // only allow user to mint if token balance >  the user if the balance > 0
-                active = active && valid;
-            } catch (e) {
-                active = false;
-                // no whitelist user, no mint
-                console.log('There was a problem fetching SPL token balance');
-                console.log(e);
-            }
-        } else {
-            const balance = new anchor.BN(
-                await connection.getBalance(walletPublicKey),
-            );
-            const valid = balance.gte(userPrice);
-            active = active && valid;
-        }
-
-        // datetime to stop the mint?
-        if (cndy?.state.endSettings?.endSettingType.date) {
-            if (
-                new Date().getTime() / 1000 >
-                cndy.state.endSettings.number.toNumber() + shift
-            ) {
-                active = false;
-            }
-        }
-        // amount to stop the mint?
-        if (cndy?.state.endSettings?.endSettingType.amount) {
-            const limit = Math.min(
-                cndy.state.endSettings.number.toNumber(),
-                cndy.state.itemsAvailable,
-            );
-
-            if (cndy.state.itemsRedeemed >= limit) {
-                cndy.state.isSoldOut = true;
-            }
-        }
-
-        if (cndy.state.isSoldOut) {
-            active = false;
-        }
-
-        // const [collectionPDA] = await getCollectionPDA(candyMachinePublicKey);
-        // const collectionPDAAccount = await connection.getAccountInfo(
-        //     collectionPDA,
-        // );
-
-        cndy.state.isActive = active;
-        cndy.state.isPresale = presale;
-
-        // console.log(`Candy Machine:`, cndy);
-
-        // const txnEstimate =
-        //     892 +
-        //     (!!collectionPDAAccount && cndy.state.retainAuthority ? 182 : 0) +
-        //     (cndy.state.tokenMint ? 66 : 0) +
-        //     (cndy.state.whitelistMintSettings ? 34 : 0) +
-        //     (cndy.state.whitelistMintSettings?.mode?.burnEveryTime ? 34 : 0) +
-        //     (cndy.state.gatekeeper ? 33 : 0) +
-        //     (cndy.state.gatekeeper?.expireOnUse ? 66 : 0);
-
-        // console.log(`Transaction estimate: ${txnEstimate}`);
-
-        return cndy;
-    } catch (e) {
-        console.log(e);
+        sleep(100 * i);
     }
 
-    return null;
+    if (blockTime === null) {
+        throw `failed to get block time for slot ${currentSlot}`;
+    }
+
+    const shift = new Date().getTime() / 1000 - blockTime;
+
+    let active =
+        cndy?.state.goLiveDate?.toNumber() + shift <
+        new Date().getTime() / 1000;
+    let presale = false;
+
+    // duplication of state to make sure we have the right values!
+    let isWLUser = false;
+    let userPrice = cndy.state.price;
+
+    // whitelist mint?
+    if (cndy?.state.whitelistMintSettings) {
+        // is it a presale mint?
+        if (
+            cndy.state.whitelistMintSettings.presale &&
+            (!cndy.state.goLiveDate ||
+                cndy.state.goLiveDate.toNumber() + shift >
+                new Date().getTime() / 1000)
+        ) {
+            presale = true;
+        }
+
+        // is there a discount?
+        if (cndy.state.whitelistMintSettings.discountPrice) {
+            userPrice = cndy.state.whitelistMintSettings.discountPrice;
+        } else {
+            // when presale=false and discountPrice=null, mint is restricted
+            // to whitelist users only
+            if (!cndy.state.whitelistMintSettings.presale) {
+                cndy.state.isWhitelistOnly = true;
+            }
+        }
+
+        // retrieves the whitelist token
+        // const mint = new anchor.web3.PublicKey(
+        //     cndy.state.whitelistMintSettings.mint,
+        // );
+        // const token = (
+        //     await getAtaForMint(mint, walletPublicKey)
+        // )[0];
+        //
+        // try {
+        //     const balance = await connection.getTokenAccountBalance(token);
+        //     isWLUser = parseInt(balance.value.amount) > 0;
+        //     // only whitelist the user if the balance > 0
+        //
+        //     if (cndy.state.isWhitelistOnly) {
+        //         active = isWLUser && (presale || active);
+        //     }
+        // } catch (e) {
+        //     // no whitelist user, no mint
+        //     if (cndy.state.isWhitelistOnly) {
+        //         active = false;
+        //     }
+        //     console.log(
+        //         'There was a problem fetching whitelist token balance',
+        //     );
+        //     console.log(e);
+        // }
+    }
+
+    userPrice = isWLUser ? userPrice : cndy.state.price;
+
+    if (cndy?.state.tokenMint) {
+        // retrieves the SPL token
+        const mint = new anchor.web3.PublicKey(cndy.state.tokenMint);
+        const token = (
+            await getAtaForMint(mint, walletPublicKey)
+        )[0];
+
+        try {
+            const balance = await connection.getTokenAccountBalance(token);
+
+            const valid = new anchor.BN(balance.value.amount).gte(userPrice);
+
+            // only allow user to mint if token balance >  the user if the balance > 0
+            active = active && valid;
+        } catch (e) {
+            active = false;
+            // no whitelist user, no mint
+            console.log('There was a problem fetching SPL token balance');
+            console.log(e);
+        }
+    } else {
+        const balance = new anchor.BN(
+            await connection.getBalance(walletPublicKey),
+        );
+        const valid = balance.gte(userPrice);
+        active = active && valid;
+    }
+
+    // datetime to stop the mint?
+    if (cndy?.state.endSettings?.endSettingType.date) {
+        if (
+            new Date().getTime() / 1000 >
+            cndy.state.endSettings.number.toNumber() + shift
+        ) {
+            active = false;
+        }
+    }
+    // amount to stop the mint?
+    if (cndy?.state.endSettings?.endSettingType.amount) {
+        const limit = Math.min(
+            cndy.state.endSettings.number.toNumber(),
+            cndy.state.itemsAvailable,
+        );
+
+        if (cndy.state.itemsRedeemed >= limit) {
+            cndy.state.isSoldOut = true;
+        }
+    }
+
+    if (cndy.state.isSoldOut) {
+        active = false;
+    }
+
+    // const [collectionPDA] = await getCollectionPDA(candyMachinePublicKey);
+    // const collectionPDAAccount = await connection.getAccountInfo(
+    //     collectionPDA,
+    // );
+
+    cndy.state.isActive = active;
+    cndy.state.isPresale = presale;
+
+    // console.log(`Candy Machine:`, cndy);
+
+    // const txnEstimate =
+    //     892 +
+    //     (!!collectionPDAAccount && cndy.state.retainAuthority ? 182 : 0) +
+    //     (cndy.state.tokenMint ? 66 : 0) +
+    //     (cndy.state.whitelistMintSettings ? 34 : 0) +
+    //     (cndy.state.whitelistMintSettings?.mode?.burnEveryTime ? 34 : 0) +
+    //     (cndy.state.gatekeeper ? 33 : 0) +
+    //     (cndy.state.gatekeeper?.expireOnUse ? 66 : 0);
+
+    // console.log(`Transaction estimate: ${txnEstimate}`);
+
+    return cndy;
 };
 
 export const getCandyMachineState = async (
