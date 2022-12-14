@@ -233,7 +233,7 @@ export default function ProjectMint() {
                                         <Box display="flex" justifyContent="space-between" sx={{width: '100%'}}>
                                             <strong>Total Minted:</strong>
                                             <span>
-                                                {candyMachineAccount.state.itemsRedeemed * 100 / candyMachineAccount.state.itemsAvailable}%
+                                                {(candyMachineAccount.state.itemsRedeemed * 100 / candyMachineAccount.state.itemsAvailable).toFixed(2)}%
                                                 ({candyMachineAccount.state.itemsRedeemed}/{candyMachineAccount.state.itemsAvailable})
                                             </span>
                                         </Box>
