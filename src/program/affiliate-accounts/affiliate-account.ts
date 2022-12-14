@@ -150,17 +150,8 @@ export default class AffiliateAccount {
             balance = this.getHistoricalBalance();
         }
 
-        console.log(
-            `Balance ${balance}\n
-            Affiliate fee percentage: ${this.project.projectAccount.data.affiliate_fee_percentage}\n
-            NFT Price in SOL: ${nftPriceInSol}\n
-            `,
-            balance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100),
-            Math.ceil(balance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100))
-        );
-
         /* Floating point arithmetic FTW */
-        return Math.ceil(balance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100));
+        return Math.floor(balance / (this.project.projectAccount.data.affiliate_fee_percentage * nftPriceInSol / 100));
     }
 
     createdAt(): string {
