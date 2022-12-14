@@ -122,6 +122,7 @@ export const getCandyMachineAccount = async (
 
             break;
         } catch (e) {
+            console.log(e);
             i++;
         }
 
