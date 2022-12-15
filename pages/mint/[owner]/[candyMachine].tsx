@@ -16,6 +16,7 @@ import getDiscountedNftPrice from "../../../src/program/utils/discount-price-cal
 import {CandyMachineAccount} from "../../../src/candy-machine/candy-machine";
 import Link from "next/link";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import PersonTwoToneIcon from "@mui/icons-material/PersonTwoTone";
 
 export default function ProjectMint() {
     const {setMessage} = useContext(PopupMessageContext);
@@ -197,18 +198,16 @@ export default function ProjectMint() {
                             </Box>
                         }
                         {!wallet.connected ?
-                            <Typography variant="h4">
-                                You have to
-                                &nbsp;
-                                <a href='#' className="link" onClick={(e: any) => {
-                                    e.preventDefault();
-                                    showWalletsModal();
-                                }}>
-                                    connect your wallet
-                                </a>
-                                &nbsp;
-                                in order to mint
-                            </Typography>
+                            <Button
+                                variant="contained"
+                                color="success"
+                                size="large"
+                                startIcon={<PersonTwoToneIcon />}
+                                onClick={showWalletsModal}
+                                sx={{width: '100%'}}
+                            >
+                                Connect your wallet
+                            </Button>
                             :
                             candyMachineAccount !== null && (
                                 !isLive(candyMachineAccount) ?
