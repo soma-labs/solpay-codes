@@ -87,7 +87,7 @@ export default function ProjectDetails() {
         <Container maxWidth="xl" sx={{p: 3}} className="nft-project nft-project--single">
             {projectLoading ? <LoadingIcon/> : !project ? null :
                 <Grid container display="flex" justifyContent="center" spacing={3}>
-                    <Grid item xs={12} md={4} display="flex" flexDirection="column" alignItems="center">
+                    <Grid item xs={12} md={6} xl={4} display="flex" flexDirection="column" alignItems="center">
                         <Box className="nft-project__image-container" mb={3}>
                             {project.projectData?.image_url &&
                                 <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
@@ -125,24 +125,39 @@ export default function ProjectDetails() {
                                 </Link>
                             }
                         </Box>
-                    </Grid>
 
-                    <Grid item xs={12} md={4}>
-                        <Box component="header" className="nft-project__header" mb={3}>
-                            <Typography variant="h1" className="nft-project__title" mb={2}>
-                                {project.getTitle()}
-                            </Typography>
+                        <Box
+                            component="section"
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            className="nft-project__actions"
+                            sx={{width: '100%', marginTop: 3, marginBottom: 3}}
+                        >
+                            {project.projectAccount.data.max_affiliate_count > project.projectAccount.data.affiliate_count && !walletIsProjectAffiliate &&
+                                <LoadingButton
+                                    loading={isRegistering}
+                                    onClick={onAffiliateRegistrationClick}
+                                    variant="contained"
+                                    color="success"
+                                >
+                                    Register as Affiliate
+                                </LoadingButton>
+                            }
 
-                            <Typography
-                                component="div"
-                                className="nft-project__description"
-                                dangerouslySetInnerHTML={{
-                                    __html: project.projectData?.description?.replace(/\r\n|\r|\n/g, "<br>") ?? ''
-                                }}
-                            />
+                            <Link href={project.getMintLink()}>
+                                <a>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                    >
+                                        GET NFT
+                                    </Button>
+                                </a>
+                            </Link>
                         </Box>
 
-                        <Box component="section" className="nft-project__details">
+                        <Box component="section" className="nft-project__details" sx={{width: '100%'}}>
                             <Typography component="h3" variant="h3" mb={2}>
                                 Details
                             </Typography>
@@ -201,36 +216,21 @@ export default function ProjectDetails() {
                                 </ListItem>
                             </List>
                         </Box>
+                    </Grid>
 
-                        <Box
-                            component="section"
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            className="nft-project__actions"
-                            sx={{marginTop: 3}}
-                        >
-                            {project.projectAccount.data.max_affiliate_count > project.projectAccount.data.affiliate_count && !walletIsProjectAffiliate &&
-                                <LoadingButton
-                                    loading={isRegistering}
-                                    onClick={onAffiliateRegistrationClick}
-                                    variant="contained"
-                                    color="success"
-                                >
-                                    Register as Affiliate
-                                </LoadingButton>
-                            }
+                    <Grid item xs={12} md={6} xl={4}>
+                        <Box component="header" className="nft-project__header" mb={3}>
+                            <Typography variant="h1" className="nft-project__title" mb={2}>
+                                {project.getTitle()}
+                            </Typography>
 
-                            <Link href={project.getMintLink()}>
-                                <a>
-                                    <Button
-                                        variant="contained"
-                                        color="success"
-                                    >
-                                        GET NFT
-                                    </Button>
-                                </a>
-                            </Link>
+                            <Typography
+                                component="div"
+                                className="nft-project__description"
+                                dangerouslySetInnerHTML={{
+                                    __html: project.projectData?.description?.replace(/\r\n|\r|\n/g, "<br>") ?? ''
+                                }}
+                            />
                         </Box>
                     </Grid>
                 </Grid>

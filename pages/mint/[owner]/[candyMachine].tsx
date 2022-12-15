@@ -139,7 +139,7 @@ export default function ProjectMint() {
         <Container maxWidth="xl" sx={{p: 3}} className="nft-project nft-project--mint">
             {projectLoading ? <LoadingIcon/>: !project ? null :
                 <Grid container display="flex" justifyContent="center" spacing={3}>
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={12} md={6} xl={4}>
                         <Box className="nft-project__image-container" mb={3}>
                             {project.projectData?.image_url &&
                                 <Image src={project.projectData.image_url} className="nft-project__image" alt="" layout="fill"/>
@@ -191,7 +191,7 @@ export default function ProjectMint() {
                             />
                         </Box>
                     </Grid>
-                    <Grid item xs={12} md={4} display="flex" flexDirection="column" alignItems="center">
+                    <Grid item xs={12} md={6} xl={4} display="flex" flexDirection="column" alignItems="center">
                         {qrImageData &&
                             <Box mb={2}>
                                 <Image src={qrImageData} width={512} height={512} alt=""/>
