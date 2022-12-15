@@ -122,7 +122,7 @@ export const getCandyMachineAccount = async (
 
             break;
         } catch (e) {
-            console.log(e);
+            console.log(`Block time request #${i + 1} failed:`, e);
             i++;
         }
 
