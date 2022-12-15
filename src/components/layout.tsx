@@ -41,7 +41,7 @@ export default function Layout({ children }: { children: any }) {
                     <div className="cma-main__sidebar__logo mb-5">
                         <Link href="/">
                             <a>
-                                <Image src={`/images/solpay-codes-logo.jpg`} alt="solpay.codes logo" width={183.6} height={183.6}/>
+                                <Image src={`/images/solpay-codes-logo.jpg`} alt="solpay.codes logo" width={183.6} height={183.6} priority={true}/>
                             </a>
                         </Link>
                     </div>

@@ -10,6 +10,7 @@ import {WalletAffiliateAccountsContext} from "../../../src/providers/wallet-affi
 import {sleep} from "@toruslabs/base-controllers";
 import Image from "next/image";
 import {Box, Button, CircularProgress, Container, Grid, List, ListItem, Typography} from "@mui/material";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {LoadingButton} from "@mui/lab";
 import {SolTokenIcon} from "../../../src/program/constants";
 import Link from "next/link";
@@ -96,21 +97,30 @@ export default function ProjectDetails() {
                             {project.projectData?.url &&
                                 <Link href={project.projectData.url}>
                                     <a target={'_blank'}>
-                                        <Image src={`/images/website-icon.png`} alt="" width={50} height={50}/>
+                                        <Typography component="span" sx={{display: 'flex', alignItems: 'center', mr: 1}}>
+                                            <OpenInNewIcon fontSize="small" sx={{mr: 1}}/>
+                                            Website
+                                        </Typography>
                                     </a>
                                 </Link>
                             }
                             {project.projectData?.twitter_url &&
                                 <Link href={project.projectData.twitter_url}>
                                     <a target={'_blank'}>
-                                        <Image src={`/images/twitter-icon.png`} alt="" width={50} height={50}/>
+                                        <Typography component="span" sx={{display: 'flex', alignItems: 'center', mr: 1}}>
+                                            <OpenInNewIcon fontSize="small" sx={{mr: 1}}/>
+                                            Twitter
+                                        </Typography>
                                     </a>
                                 </Link>
                             }
                             {project.projectData?.discord_url &&
                                 <Link href={project.projectData.discord_url}>
                                     <a target={'_blank'}>
-                                        <Image src={`/images/discord-icon.png`} alt="" width={50} height={50}/>
+                                        <Typography component="span" sx={{display: 'flex', alignItems: 'center', mr: 1}}>
+                                            <OpenInNewIcon fontSize="small" sx={{mr: 1}}/>
+                                            Discord
+                                        </Typography>
                                     </a>
                                 </Link>
                             }
