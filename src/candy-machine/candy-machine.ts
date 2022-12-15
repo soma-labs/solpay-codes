@@ -126,7 +126,7 @@ export const getCandyMachineAccount = async (
             i++;
         }
 
-        sleep(100 * i);
+        await sleep(100 * i);
     }
 
     if (blockTime === null) {
